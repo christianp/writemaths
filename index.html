@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+		<title>Write maths, see maths!</title>
+		<SCRIPT SRC="http://cdn.mathjax.org/mathjax/latest/MathJax.js">
+		  MathJax.Hub.Config({
+			extensions: ['tex2jax.js',"TeX/AMSmath.js"],
+			tex2jax: {inlineMath: [["$","$"],["\\(","\\)"]]},
+			jax: ["input/TeX","output/HTML-CSS"],
+			displayAlign: "center",
+			displayIndent: "0.1em",
+			showProcessingMessages: false
+		  });
+		</SCRIPT>
+		<script type="text/javascript" src="jquery-1.6.js"></script>
+		<script type="text/javascript" src="jquery-ui-1.8.12.custom.min.js"></script>
+		<script type="text/javascript" src="jme.js"></script>
+		<script type="text/javascript" src="writemaths.js"></script>
+		<script language="javascript">
+			var wm;
+			$(window).ready(function() {
+				wm = new WriteMaths('#writemaths','#printout');
+				$('#clear').click(function() {
+					wm.setState('');
+					wm.saveState();
+				});
+				$('#togglehtml').click(function() {
+					wm.getHTML();
+					var t = $('#printout').toggle().is(':visible') ? 'Hide HTML' : 'Show HTML';
+					$('#togglehtml').val(t);
+				});
+			});
+		</script>
+		
+		<style type="text/css">
+			.writemaths .question {
+				background: #f0f0f0;
+			}
+			.writemaths {
+				font-size:150%;
+				font-family: serif;
+			}
+			.writemaths p, .writemaths h1, .writemaths h2, .writemaths h3, .writemaths h4, .writemaths h5, .writemaths h6 {
+				background: #fafafa;
+			}
+			.writemaths textarea, .writemaths p, .writemaths h1, .writemaths h2, .writemaths h3, .writemaths h4, .writemaths h5, .writemaths h6 {
+				width: 100%;
+				margin: 0.1em 0;
+				padding: 0.1em 0.2em;
+			}
+			.writemaths textarea {
+				width: 99%;
+				font-size: 100%;
+				font-family: serif;
+			}
+		</style>
+
+	</head>
+	<body>
+		<div id="writemaths">
+h1=. Write maths, see maths
+Click on a line of text to edit it.
+Press enter for a new paragraph.
+Use the cursor keys to move between paragraphs quickly.
+Write $m + a + t +h/s$
+ or ${\LaTeX}$ 
+or "Textile":http://textile.thresholdstate.com
+Enclose maths in dollar signs, or in escaped square brackets for display mode: $e^(pi i)+1=0$ \[ e^(pi i) + 1 = 0 \]
+Maths is converted from a simple (BASIC-style) syntax to LaTeX automatically. To keep raw LaTeX, enclose it in curly braces: \[ 1/2 {+ \sum_1^N \left( \frac{1}{n} \right) +} abs(y) \]
+Click on the "Show HTML" button to get something you can copy and paste into a blog post or other web page (requires MathJax to be loaded on the page you paste it into)
+</div>
+		<input type="button" value="Clear" id="clear"/>
+		<input type="button" value="Show HTML" id="togglehtml"/>
+		<textarea id="printout" style="display:none;"></textarea>
+	</body>
+</html>
