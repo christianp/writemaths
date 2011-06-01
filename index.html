@@ -3,6 +3,8 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 		<title>Write maths, see maths!</title>
+
+		<!-- MathJax -->
 		<SCRIPT SRC="http://cdn.mathjax.org/mathjax/latest/MathJax.js">
 		  MathJax.Hub.Config({
 			extensions: ['tex2jax.js',"TeX/AMSmath.js"],
@@ -12,11 +14,23 @@
 			displayIndent: "0.1em",
 			showProcessingMessages: false
 		  });
-		</SCRIPT>
+	  	</SCRIPT>
+
+		<!-- jQuery -->
 		<script type="text/javascript" src="jquery-1.6.js"></script>
 		<script type="text/javascript" src="jquery-ui-1.8.12.custom.min.js"></script>
+
+		<!-- Numbas JME maths compiler/evaluator/renderer -->
 		<script type="text/javascript" src="jme.js"></script>
+
+		<!-- jsxGraph -->
+		<script type="text/javascript" src="jsxgraphcore.js"></script>
+		<link rel="stylesheet" type="text/css" href="jsxgraph.css" />
+
+		<!-- generic writemaths code -->
 		<script type="text/javascript" src="writemaths.js"></script>
+
+		<!-- init writemaths area, hook up buttons -->
 		<script language="javascript">
 			var wm;
 			$(window).ready(function() {
@@ -32,7 +46,7 @@
 				});
 			});
 		</script>
-		
+
 		<style type="text/css">
 			.writemaths .question {
 				background: #f0f0f0;
@@ -54,6 +68,10 @@
 				font-size: 100%;
 				font-family: serif;
 			}
+			.writemaths .graph {
+				border: 1px solid;
+				margin: 0 auto;
+			}
 		</style>
 
 	</head>
@@ -69,6 +87,9 @@ or "Textile":http://textile.thresholdstate.com
 Enclose maths in dollar signs, or in escaped square brackets for display mode: $e^(pi i)+1=0$ \[ e^(pi i) + 1 = 0 \]
 Maths is converted from a simple (BASIC-style) syntax to LaTeX automatically. To keep raw LaTeX, enclose it in curly braces: \[ 1/2 {+ \sum_1^N \left( \frac{1}{n} \right) +} abs(y) \]
 Click on the "Show HTML" button to get something you can copy and paste into a blog post or other web page (requires MathJax to be loaded on the page you paste it into)
+Insert geometric drawings by writing "JessieScript":http://jsxgraph.uni-bayreuth.de/distrib/jessiescript_ref_en.pdf between double percent signs.
+The triangle $ABC$ has centre $M$. %%A(1,1);B(-1,1);C(0,-1);[AB];[AC];[BC];D=1/2(A,B);E=1/2(A,C);F=1/2(B,C);]CD[;]BE[;]AF[;M=[CD]&[AF];%%
+The equation of the circle with midpoint $(1,1)$ and radius $2$ %%A(1,1);k(A,2)%% is \[ (x-1)^2+(y-1)^2 = 4 \]
 </div>
 		<input type="button" value="Clear" id="clear"/>
 		<input type="button" value="Show HTML" id="togglehtml"/>

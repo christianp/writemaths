@@ -100,10 +100,20 @@ Numbas.util = {
 				o.push(t.slice(s,i));
 				o.push(t.slice(i,i+2));
 				s=i+2;
+				i+=1;
+			}
+			else if( i<l-1 && t.slice(i,i+2)=='%%' )
+			{
+				o.push(t.slice(s,i));
+				o.push('%%');
+				s=i+2;
+				i+=1;
 			}
 		}
 		if(s<l)
 			o.push(t.slice(s));
+		else
+			o.push('');
 		return o;
 	}
 };

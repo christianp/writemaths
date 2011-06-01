@@ -87,11 +87,14 @@ function WriteMaths(e,d)
 			input2display($(this));
 	});
 
+	e.find('.graph').live('click',function(e){e.preventDefault();e.stopPropagation();if(!e){var e = window.event;};e.cancelBubble = true;return false;});
+
 
 	///set up
 	this.setState(e.text().trim());
 	this.load();
 }
+WriteMaths.numGraphs = 0;
 
 WriteMaths.prototype = {
 	load: function() {
@@ -108,6 +111,7 @@ WriteMaths.prototype = {
 		{
 			var p = makeParagraph(lines[i]);
 			this.e.prepend(p);
+			finishParagraph(p);
 		}
 	},
 
@@ -168,21 +172,46 @@ function makeParagraph(val,notypeset)
 		var dval = $.trim(val).replace(/\n/g,'');
 		dval = textile(dval);
 		var bits = Numbas.util.contentsplitbrackets(dval);
-		var dval='';
-		for(var i=0; i<bits.length; i++)
+		dval='';
+		for(var i=0;i<bits.length;i++)
 		{
-			switch(i % 4)
+			switch(i % 2)
 			{
-			case 0:	//plain text - variables inserted by expressions in curly braces
+			case 0:	//text
 				dval += bits[i];
 				break;
-			case 2:	//a TeX expression - variables inserted with \var and \simplify commands
-				dval += texMaths(bits[i])
-				break;
-			case 1:	//a TeX delimiter
-			case 3:
-				dval += bits[i];
-				break;
+			case 1: //delimiter
+				switch(bits[i])
+				{
+				case '$':
+					if(i<bits.length-1)
+					{
+						dval += '$'+texMaths(bits[i+1])+'$';
+						i+=2;
+					}
+					else
+						dval += bits[i];
+					break;
+				case '\\[':
+					if(i<bits.length-1)
+					{
+						dval += '\\['+texMaths(bits[i+1])+'\\]';
+						i+=2;
+					}
+					else
+						dval += bits[i];
+					break;
+				case '%%':
+					if(i<bits.length-1)
+					{
+						WriteMaths.numGraphs += 1;
+						dval += '<div id="jsxgraph-'+WriteMaths.numGraphs+'" class="graph" source="'+bits[i+1]+'"/>';
+						i+=2;
+					}
+					else
+						dval += bits[i];
+					break;
+				}
 			}
 		}
 		d.html(dval);
@@ -202,10 +231,30 @@ function makeParagraph(val,notypeset)
 	return d;
 }
 
+function finishParagraph(p) {
+	p.find('.graph').each(function() {
+		var id = $(this).attr('id');
+		var src = $(this).attr('source');
+		$(this).css('width','400px').css('height','300px');
+		JXG.JSXGraph
+			.initBoard(id,{
+				showCopyright:false,
+				originX: 200,
+				originY: 150,
+				unitX: 50,
+				unitY: 50,
+				axis:true
+			})
+			.construct(src)
+		;
+	});
+}
+
 function input2display(e) {
 	var val = e.val();
 	var d = makeParagraph(val);
 	e.replaceWith(d);
+	finishParagraph(d);
 	return d;
 }
 
@@ -317,34 +366,9 @@ textile = function(t) {
 	lst="";
 	return html;
 }
-//split content text up by TeX delimiters
-function contentsplitbrackets(t)
-{
-	var o=[];
-	var l=t.length;
-	var s=0;
-	for(var i=0;i<l;i++)
-	{
-		if(t.charAt(i)=='$')
-		{
-			o.push(t.slice(s,i));
-			o.push('$');
-			s=i+1;
-		}
-		else if (i<l-1 && t.charAt(i)=='\\' && (t.charAt(i+1)=='[' || t.charAt(i+1)==']'))
-		{
-			o.push(t.slice(s,i));
-			o.push(t.slice(i,i+2));
-			s=i+2;
-		}
-	}
-	if(s<l)
-		o.push(t.slice(s));
-	return o;
-}
 
 function prep(m){
-	var bits = contentsplitbrackets(m);
+	var bits = Numbas.util.contentsplitbrackets(m);
 	var i;
 	for( var j=0; j<bits.length; j+=4)
 	{
