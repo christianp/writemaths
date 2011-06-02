@@ -1,0 +1,21 @@
+.writemaths {
+	font-size:150%;
+	font-family: serif;
+}
+.writemaths p, .writemaths h1, .writemaths h2, .writemaths h3, .writemaths h4, .writemaths h5, .writemaths h6 {
+	background: #fafafa;
+}
+.writemaths textarea, .writemaths p, .writemaths h1, .writemaths h2, .writemaths h3, .writemaths h4, .writemaths h5, .writemaths h6 {
+	width: 100%;
+	margin: 0.1em 0;
+	padding: 0.1em 0.2em;
+}
+.writemaths textarea {
+	width: 99%;
+	font-size: 100%;
+	font-family: serif;
+}
+.writemaths .graph {
+	border: 1px solid;
+	margin: 0 auto;
+}

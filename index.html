@@ -34,7 +34,7 @@
 		<script language="javascript">
 			var wm;
 			$(window).ready(function() {
-				wm = new WriteMaths('#writemaths','#printout');
+				wm = new WriteMaths('#writemaths','#printout','writemaths');
 				$('#clear').click(function() {
 					wm.setState('');
 					wm.saveState();
@@ -47,32 +47,7 @@
 			});
 		</script>
 
-		<style type="text/css">
-			.writemaths .question {
-				background: #f0f0f0;
-			}
-			.writemaths {
-				font-size:150%;
-				font-family: serif;
-			}
-			.writemaths p, .writemaths h1, .writemaths h2, .writemaths h3, .writemaths h4, .writemaths h5, .writemaths h6 {
-				background: #fafafa;
-			}
-			.writemaths textarea, .writemaths p, .writemaths h1, .writemaths h2, .writemaths h3, .writemaths h4, .writemaths h5, .writemaths h6 {
-				width: 100%;
-				margin: 0.1em 0;
-				padding: 0.1em 0.2em;
-			}
-			.writemaths textarea {
-				width: 99%;
-				font-size: 100%;
-				font-family: serif;
-			}
-			.writemaths .graph {
-				border: 1px solid;
-				margin: 0 auto;
-			}
-		</style>
+		<link rel="stylesheet" type="text/css" href="writemaths.css" />
 
 	</head>
 	<body>
@@ -90,9 +65,10 @@ Click on the "Show HTML" button to get something you can copy and paste into a b
 Insert geometric drawings by writing "JessieScript":http://jsxgraph.uni-bayreuth.de/distrib/jessiescript_ref_en.pdf between double percent signs.
 The triangle $ABC$ has centre $M$. %%A(1,1);B(-1,1);C(0,-1);[AB];[AC];[BC];D=1/2(A,B);E=1/2(A,C);F=1/2(B,C);]CD[;]BE[;]AF[;M=[CD]&[AF];%%
 The equation of the circle with midpoint $(1,1)$ and radius $2$ %%A(1,1);k(A,2)%% is \[ (x-1)^2+(y-1)^2 = 4 \]
-</div>
+		</div>
 		<input type="button" value="Clear" id="clear"/>
 		<input type="button" value="Show HTML" id="togglehtml"/>
 		<textarea id="printout" style="display:none;"></textarea>
+
 	</body>
 </html>

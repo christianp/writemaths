@@ -1,11 +1,12 @@
-
-function WriteMaths(e,d)
+function WriteMaths(e,d,saveName)
 {
 	e=$(e);
 	e.addClass('writemaths');
 	this.e = e;
 	d=$(d);
 	this.d = d;
+
+	this.saveName = saveName;
 	
 	var wm = this;
 
@@ -98,9 +99,12 @@ WriteMaths.numGraphs = 0;
 
 WriteMaths.prototype = {
 	load: function() {
-		s = window.localStorage['writemaths'];
-		if(s)
-			this.setState(s);
+		if(this.saveName)
+		{
+			s = localStorage[this.saveName];
+			if(s)
+				this.setState(s);
+		}
 	},
 
 	setState: function(s) {
@@ -123,8 +127,11 @@ WriteMaths.prototype = {
 	},
 
 	saveState: function() {
-		var s = this.getState().join('\n');
-		window.localStorage['writemaths']= s;
+		if(this.saveName)
+		{
+			var s = this.getState();
+			localStorage[this.saveName]= s.join('\n');
+		}
 	},
 
 	getHTML: function() {
