@@ -90,6 +90,8 @@ WriteMaths.prototype = {
 					ev.preventDefault();
 				}
 				break;
+			case 27:
+				$(this).blur();
 			}
 		});
 		e.delegate('textarea, input','keyup',function() {
