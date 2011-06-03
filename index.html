@@ -34,7 +34,10 @@
 		<script language="javascript">
 			var wm;
 			$(window).ready(function() {
-				wm = new WriteMaths('#writemaths','#printout','writemaths');
+				wm = new WriteMaths('#writemaths',{
+					display: '#printout',
+					saveName: 'writemaths'
+				});
 				$('#clear').click(function() {
 					wm.setState('');
 					wm.saveState();

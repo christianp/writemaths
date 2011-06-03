@@ -1,13 +1,12 @@
-function WriteMaths(e,d,options)
+function WriteMaths(e,options)
 {
+	if(!options)
+		options = {};
 	e=$(e);
 	e.addClass('writemaths');
 	this.e = e;
-	d=$(d);
-	this.d = d;
+	this.d = $(options.display);
 
-	if(!options)
-		options = {};
 	this.saveName = options.saveName;
 	
 	this.bindEvents();
@@ -28,7 +27,7 @@ WriteMaths.prototype = {
 		var d = this.d;
 
 		//clicking on a paragraph makes it editable
-		e.delegate('p, header','click',function(e) {
+		e.delegate('p, :header','click',function(e) {
 			var d = input();
 			d.val($(this).attr('source').trim());
 			$(this).replaceWith(d);
