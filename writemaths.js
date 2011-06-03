@@ -1,13 +1,13 @@
-function WriteMaths(e,d,options)
+function WriteMaths(e,options)
 {
+	if(!options)
+		options = {};
+
 	e=$(e);
 	e.addClass('writemaths');
 	this.e = e;
-	d=$(d);
-	this.d = d;
+	this.d = $(options.display);
 
-	if(!options)
-		options = {};
 	this.saveName = options.saveName;
 	
 	this.bindEvents();
@@ -30,7 +30,7 @@ WriteMaths.prototype = {
 		//clicking on a paragraph makes it editable
 		e.delegate('p, header','click',function(e) {
 			var d = input();
-			d.val($(this).attr('source').trim());
+			d.val(($(this).attr('source') || '').trim());
 			$(this).replaceWith(d);
 			d.focus();
 		});
@@ -164,16 +164,20 @@ WriteMaths.prototype = {
 function texMaths(s) {
 	var bits = Numbas.jme.splitbrackets(s,'{','}');
 	var out = '';
+	console.log(bits);
 	for(var i=0;i<bits.length;i++)
 	{
-		if(i%2)	//raw LaTeX
-			out += bits[i];
-		else
+		if(i%2)	//JME
+		{
+			console.log(bits[i]);
 			try{
 				out += Numbas.jme.display.exprToLaTeX(bits[i]);
 			}catch(e){
 				out+=bits[i];
 			}
+		}
+		else	//raw LaTeX
+			out += bits[i];
 	}
 	return out;
 };
