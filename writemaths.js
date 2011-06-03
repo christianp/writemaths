@@ -6,7 +6,6 @@ function WriteMaths(e,options)
 	e.addClass('writemaths');
 	this.e = e;
 	this.d = $(options.display);
-
 	this.saveName = options.saveName;
 	
 	this.bindEvents();
@@ -29,7 +28,7 @@ WriteMaths.prototype = {
 		//clicking on a paragraph makes it editable
 		e.delegate('p, :header','click',function(e) {
 			var d = input();
-			d.val($(this).attr('source').trim());
+			d.val(($(this).attr('source') || '').trim());
 			$(this).replaceWith(d);
 			d.focus();
 		});
@@ -165,11 +164,12 @@ WriteMaths.prototype = {
 function texMaths(s) {
 	var bits = Numbas.jme.splitbrackets(s,'{','}');
 	var out = '';
+	console.log(bits);
 	for(var i=0;i<bits.length;i++)
 	{
-		if(i%2)	//raw LaTeX
+		if(i%2)	//JME
 			out += bits[i];
-		else
+		else	//raw LaTeX
 			try{
 				out += Numbas.jme.display.exprToLaTeX(bits[i]);
 			}catch(e){

@@ -4,6 +4,7 @@
 }
 .writemaths p, .writemaths h1, .writemaths h2, .writemaths h3, .writemaths h4, .writemaths h5, .writemaths h6 {
 	background: #fafafa;
+	min-height: 1em;
 }
 .writemaths p {
 	text-indent: 1em
