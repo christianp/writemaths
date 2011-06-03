@@ -164,7 +164,6 @@ WriteMaths.prototype = {
 function texMaths(s) {
 	var bits = Numbas.jme.splitbrackets(s,'{','}');
 	var out = '';
-	console.log(bits);
 	for(var i=0;i<bits.length;i++)
 	{
 		if(i%2)	//JME
