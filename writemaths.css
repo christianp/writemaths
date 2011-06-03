@@ -5,12 +5,12 @@
 .writemaths p, .writemaths h1, .writemaths h2, .writemaths h3, .writemaths h4, .writemaths h5, .writemaths h6 {
 	background: #fafafa;
 }
-.writemaths textarea, .writemaths p, .writemaths h1, .writemaths h2, .writemaths h3, .writemaths h4, .writemaths h5, .writemaths h6 {
+.writemaths textarea, .writemaths input, .writemaths p, .writemaths h1, .writemaths h2, .writemaths h3, .writemaths h4, .writemaths h5, .writemaths h6 {
 	width: 100%;
 	margin: 0.1em 0;
 	padding: 0.1em 0.2em;
 }
-.writemaths textarea {
+.writemaths textarea, .writemaths input {
 	width: 99%;
 	font-size: 100%;
 	font-family: serif;

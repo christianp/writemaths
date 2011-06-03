@@ -20,7 +20,7 @@ function WriteMaths(e,d,saveName)
 	
 
 	//handle keypresses in input
-	e.find('textarea').live('keydown',function(ev) {
+	e.find('textarea, input').live('keydown',function(ev) {
 		switch(ev.which)
 		{
 		case 8:
@@ -35,7 +35,7 @@ function WriteMaths(e,d,saveName)
 					$(this).attr('going',true);
 					$(this).remove();
 					p.click();
-					e.find('textarea')[0].setSelectionRange(os.length,os.length);
+					e.find('textarea, input')[0].setSelectionRange(os.length,os.length);
 				}
 				ev.stopPropagation();
 				ev.preventDefault();
@@ -76,14 +76,14 @@ function WriteMaths(e,d,saveName)
 			break;
 		}
 	});
-	e.find('textarea').live('keyup',function() {
+	e.find('textarea, input').live('keyup',function() {
 		wm.saveState();
 	});
-	e.find('textarea').live('input',function() {
+	e.find('textarea, input').live('input',function() {
 		wm.getHTML();
 	});
 
-	e.find('textarea').live('blur',function() {
+	e.find('textarea, input').live('blur',function() {
 		if(!$(this).attr('going'))
 			input2display($(this));
 	});
@@ -120,7 +120,7 @@ WriteMaths.prototype = {
 	},
 
 	getState: function() {
-		var lines = this.e.children('p, :header, textarea').map(function(){
+		var lines = this.e.children('p, :header, textarea, input').map(function(){
 			return ($(this).attr('source') || $(this).val());
 		}).toArray();
 		return lines;
@@ -169,7 +169,7 @@ function texMaths(s) {
 };
 
 function input() {
-	return $('<textarea rows="1"></textarea>');
+	return $('<input rows="1"></input>');
 }
 function makeParagraph(val,notypeset)
 {
