@@ -1,4 +1,4 @@
-function WriteMaths(e,d,saveName)
+function WriteMaths(e,d,options)
 {
 	e=$(e);
 	e.addClass('writemaths');
@@ -6,98 +6,108 @@ function WriteMaths(e,d,saveName)
 	d=$(d);
 	this.d = d;
 
-	this.saveName = saveName;
+	if(!options)
+		options = {};
+	this.saveName = options.saveName;
 	
-	var wm = this;
-
-	//clicking on a paragraph makes it editable
-	e.find('p, :header').live('click',function(e) {
-		var d = input();
-		d.val($(this).attr('source'));
-		$(this).replaceWith(d);
-		d.focus();
-	});
-	
-
-	//handle keypresses in input
-	e.find('textarea, input').live('keydown',function(ev) {
-		switch(ev.which)
-		{
-		case 8:
-			if(this.selectionStart==0 && this.selectionEnd==0)
-			{
-				var p = $(this).prev('p, :header');
-				if(p.length)
-				{
-					var os = p.attr('source') || '';
-					p.attr('source', os+$(this).val());
-					p=$(p[0]);
-					$(this).attr('going',true);
-					$(this).remove();
-					p.click();
-					e.find('textarea, input')[0].setSelectionRange(os.length,os.length);
-				}
-				ev.stopPropagation();
-				ev.preventDefault();
-			}
-			break;
-		case 13:
-			$(this).attr('going',true);
-			var i = this.selectionStart;
-			var t = $(this).val().slice(i);
-			$(this).val( $(this).val().slice(0,i));
-			var d = input2display($(this));
-			var i = input();
-			i.val(t);
-			d.after(i);
-			i.focus();
-			i[0].setSelectionRange(0,0);
-			break;
-		case 38:
-			$(this).prev('p, :header').click();
-			break;
-		case 40:
-			$(this).next('p, :header').click();
-			break;
-		case 46:
-			var val = $(this).val()
-			if(this.selectionStart==val.length && this.selectionEnd==val.length)
-			{
-				var p = $(this).next('p, :header');
-				if(p.length)
-				{
-					$(this).val(val+(p.attr('source') || ''));
-					p.remove();
-					this.setSelectionRange(val.length,val.length);
-				}
-				ev.stopPropagation();
-				ev.preventDefault();
-			}
-			break;
-		}
-	});
-	e.find('textarea, input').live('keyup',function() {
-		wm.saveState();
-	});
-	e.find('textarea, input').live('input',function() {
-		wm.getHTML();
-	});
-
-	e.find('textarea, input').live('blur',function() {
-		if(!$(this).attr('going'))
-			input2display($(this));
-	});
-
-	e.find('.graph').live('click',function(e){e.preventDefault();e.stopPropagation();if(!e){var e = window.event;};e.cancelBubble = true;return false;});
-
+	this.bindEvents();
 
 	///set up
-	this.setState(e.text().trim());
+	if(options.content)
+		this.setState(options.content.trim());
+	else
+		this.setState(e.text().trim());
 	this.load();
 }
 WriteMaths.numGraphs = 0;
 
 WriteMaths.prototype = {
+	bindEvents: function() {
+		var wm = this;
+		var e = this.e;
+		var d = this.d;
+
+		//clicking on a paragraph makes it editable
+		e.delegate('p, header','click',function(e) {
+			var d = input();
+			d.val($(this).attr('source').trim());
+			$(this).replaceWith(d);
+			d.focus();
+		});
+		
+
+		//handle keypresses in input
+		e.delegate('textarea, input','keydown',function(ev) {
+			switch(ev.which)
+			{
+			case 8:
+				if(this.selectionStart==0 && this.selectionEnd==0)
+				{
+					var p = $(this).prev('p, :header');
+					if(p.length)
+					{
+						var os = p.attr('source') || '';
+						p.attr('source', os+$(this).val());
+						p=$(p[0]);
+						$(this).attr('going',true);
+						$(this).remove();
+						p.click();
+						e.find('textarea, input')[0].setSelectionRange(os.length,os.length);
+					}
+					ev.stopPropagation();
+					ev.preventDefault();
+				}
+				break;
+			case 13:
+				$(this).attr('going',true);
+				var i = this.selectionStart;
+				var t = $(this).val().slice(i);
+				$(this).val( $(this).val().slice(0,i));
+				var d = input2display($(this));
+				var i = input();
+				i.val(t);
+				d.after(i);
+				i.focus();
+				i[0].setSelectionRange(0,0);
+				break;
+			case 38:
+				$(this).prev('p, :header').click();
+				break;
+			case 40:
+				$(this).next('p, :header').click();
+				break;
+			case 46:
+				var val = $(this).val()
+				if(this.selectionStart==val.length && this.selectionEnd==val.length)
+				{
+					var p = $(this).next('p, :header');
+					if(p.length)
+					{
+						$(this).val(val+(p.attr('source') || ''));
+						p.remove();
+						this.setSelectionRange(val.length,val.length);
+					}
+					ev.stopPropagation();
+					ev.preventDefault();
+				}
+				break;
+			}
+		});
+		e.delegate('textarea, input','keyup',function() {
+			wm.saveState();
+		});
+		e.delegate('textarea, input','input',function() {
+			wm.getHTML();
+		});
+
+		e.delegate('textarea, input','blur',function() {
+			if(!$(this).attr('going'))
+				input2display($(this));
+		});
+
+		e.delegate('.graph','click',function(e){e.preventDefault();e.stopPropagation();if(!e){var e = window.event;};e.cancelBubble = true;return false;});
+	},
+
 	load: function() {
 		if(this.saveName)
 		{
