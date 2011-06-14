@@ -146,7 +146,7 @@ WriteMaths.prototype = {
 			{
 				var words = val.slice(startMath).split(' ');
 				var j = 0;
-				while(j<words.length && !words[j].match(/\w\w+/))
+				while(j<words.length && !words[j].match(/^\w\w+$/))
 				{
 					j+=1;
 				}
