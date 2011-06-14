@@ -31,6 +31,7 @@ WriteMaths.prototype = {
 			d.val(($(this).attr('source') || '').trim());
 			$(this).replaceWith(d);
 			d.focus();
+			positionPreview.apply(d[0]);
 		});
 		
 
@@ -93,6 +94,85 @@ WriteMaths.prototype = {
 				$(this).blur();
 			}
 		});
+
+		function positionPreview() {
+			if(this.selectionStart!=this.selectionEnd)
+				return;
+
+			var txt = $(this).val().slice(0,this.selectionStart);
+
+			var i=0;
+			var inMath=false;
+			var startMath = 0;
+			var mathDelimit;
+			while(i<this.selectionStart)
+			{
+				if(inMath)
+				{
+					if(txt.slice(i,i+mathDelimit.length)==mathDelimit)
+					{
+						inMath = false;
+						i+=mathDelimit.length-1;
+					}
+				}
+				else if(txt[i]=='$')
+				{
+					inMath = true;
+					startMath = i;
+					mathDelimit = '$';
+				}
+				else if(txt.slice(i,i+2)=='\\[')
+				{
+					inMath = true;
+					startMath = i;
+					mathDelimit = '\\]';
+				}
+				i+=1;
+			}
+			if(!inMath)
+			{
+				e.find('.preview').hide();
+				return;
+			}
+			var val = $(this).val();
+			i = startMath+1;
+			while(i<val.length && inMath)
+			{
+				if(val.slice(i,i+mathDelimit.length)==mathDelimit)
+					inMath = false;
+				i+=1;
+			}
+			if(i==val.length)
+			{
+				var words = val.slice(startMath).split(' ');
+				var j = 0;
+				while(j<words.length && !words[j].match(/\w\w+/))
+				{
+					j+=1;
+				}
+				i = startMath + words.slice(0,j).join(' ').length;
+			}
+			var math = val.slice(startMath,i+mathDelimit.length-1);
+
+			var dr = $('<p>'+txt.slice(0,startMath)+'</p>');
+			e.append(dr);
+			var w = $.textMetrics(dr).width;
+			dr.remove();
+			e.find('.preview')
+				.show()
+				.html(cleanJME(math))
+				.position({my: 'left bottom', at: 'left top', of: this, offset: w+' 0'})
+			;
+			var inp = this;
+			var queue = MathJax.Callback.Queue(MathJax.Hub.Register.StartupHook("End",{}));
+			queue.Push(['Typeset',MathJax.Hub,e.find('.preview')[0]]);
+			queue.Push(function() {
+				e.find('.preview').position({my: 'left bottom', at: 'left top', of: inp, offset: w+' 0'});
+			});
+		}
+	
+		e.delegate('textarea, input','keyup',positionPreview).delegate('textarea, input','click',positionPreview);
+
 		e.delegate('textarea, input','keyup',function() {
 			wm.saveState();
 		});
@@ -103,6 +183,7 @@ WriteMaths.prototype = {
 		e.delegate('textarea, input','blur',function() {
 			if(!$(this).attr('going'))
 				input2display($(this));
+			e.find('.preview').hide();
 		});
 
 		e.delegate('.graph','click',function(e){e.preventDefault();e.stopPropagation();if(!e){var e = window.event;};e.cancelBubble = true;return false;});
@@ -119,6 +200,8 @@ WriteMaths.prototype = {
 
 	setState: function(s) {
 		this.e.html('');
+		this.e.append('<div class="preview"/>');
+
 		var lines = s.split('\n');
 		var i = lines.length;
 		while(i--)
@@ -158,7 +241,7 @@ WriteMaths.prototype = {
 			.width('100%')
 			.attr('rows',html.split('\n').length)
 		;
-	}
+	},
 };
 
 function texMaths(s) {
@@ -186,51 +269,7 @@ function makeParagraph(val,notypeset)
 	if(val.length)
 	{
 		var d = $('<p></p>');
-		var dval = $.trim(val).replace(/\n/g,'');
-		dval = textile(dval);
-		var bits = Numbas.util.contentsplitbrackets(dval);
-		dval='';
-		for(var i=0;i<bits.length;i++)
-		{
-			switch(i % 2)
-			{
-			case 0:	//text
-				dval += bits[i];
-				break;
-			case 1: //delimiter
-				switch(bits[i])
-				{
-				case '$':
-					if(i<bits.length-1)
-					{
-						dval += '$'+texMaths(bits[i+1])+'$';
-						i+=2;
-					}
-					else
-						dval += bits[i];
-					break;
-				case '\\[':
-					if(i<bits.length-1)
-					{
-						dval += '\\['+texMaths(bits[i+1])+'\\]';
-						i+=2;
-					}
-					else
-						dval += bits[i];
-					break;
-				case '%%':
-					if(i<bits.length-1)
-					{
-						WriteMaths.numGraphs += 1;
-						dval += '<div id="jsxgraph-'+WriteMaths.numGraphs+'" class="graph" source="'+bits[i+1]+'"/>';
-						i+=2;
-					}
-					else
-						dval += bits[i];
-					break;
-				}
-			}
-		}
+		var dval = cleanJME(val);
 		d.html(dval);
 		var c = d.children();
 		if(d.children('p, :header').length==c.length && c.length==1)
@@ -246,6 +285,55 @@ function makeParagraph(val,notypeset)
 		d = $('<p><br/></p>');
 	}
 	return d;
+}
+function cleanJME(val)
+{
+	var dval = $.trim(val).replace(/\n/g,'');
+	dval = textile(dval);
+	var bits = Numbas.util.contentsplitbrackets(dval);
+	dval='';
+	for(var i=0;i<bits.length;i++)
+	{
+		switch(i % 2)
+		{
+		case 0:	//text
+			dval += bits[i];
+			break;
+		case 1: //delimiter
+			switch(bits[i])
+			{
+			case '$':
+				if(i<bits.length-1)
+				{
+					dval += '$'+texMaths(bits[i+1])+'$';
+					i+=2;
+				}
+				else
+					dval += bits[i];
+				break;
+			case '\\[':
+				if(i<bits.length-1)
+				{
+					dval += '\\['+texMaths(bits[i+1])+'\\]';
+					i+=2;
+				}
+				else
+					dval += bits[i];
+				break;
+			case '%%':
+				if(i<bits.length-1)
+				{
+					WriteMaths.numGraphs += 1;
+					dval += '<div id="jsxgraph-'+WriteMaths.numGraphs+'" class="graph" source="'+bits[i+1]+'"/>';
+					i+=2;
+				}
+				else
+					dval += bits[i];
+				break;
+			}
+		}
+	}
+	return dval;
 }
 
 function finishParagraph(p) {
@@ -898,3 +986,42 @@ function style_html(html_source, indent_size, indent_character, max_char, brace_
   }
   return multi_parser.output.join('');
 }
+
+
+(function($) {
+
+ $.textMetrics = function(el) {
+
+  var h = 0, w = 0;
+
+  var div = document.createElement('div');
+  document.body.appendChild(div);
+  $(div).css({
+   position: 'absolute',
+   left: -1000,
+   top: -1000,
+   display: 'none',
+   width: 'auto'
+  });
+
+  $(div).html($(el).html());
+  var styles = ['font-size','font-style', 'font-weight', 'font-family','line-height', 'text-transform', 'letter-spacing'];
+  $(styles).each(function() {
+   var s = this.toString();
+   $(div).css(s,$(el).css(s));
+  });
+
+  h = $(div).outerHeight();
+  w = $(div).outerWidth();
+
+  $(div).remove();
+
+  var ret = {
+   height: h,
+   width: w
+  };
+
+  return ret;
+ }
+
+})(jQuery);
