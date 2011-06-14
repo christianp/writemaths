@@ -142,6 +142,7 @@ WriteMaths.prototype = {
 					inMath = false;
 				i+=1;
 			}
+			i = Math.max(this.selectionStart,i);
 			if(i==val.length)
 			{
 				var words = val.slice(startMath).split(' ');
