@@ -142,7 +142,6 @@ WriteMaths.prototype = {
 					inMath = false;
 				i+=1;
 			}
-			i = Math.max(this.selectionStart,i);
 			if(i==val.length)
 			{
 				var words = val.slice(startMath).split(' ');
@@ -152,6 +151,7 @@ WriteMaths.prototype = {
 					j+=1;
 				}
 				i = startMath + words.slice(0,j).join(' ').length;
+				i = Math.max(this.selectionStart,i);
 			}
 			var math = val.slice(startMath,i+mathDelimit.length-1);
 
