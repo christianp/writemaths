@@ -157,18 +157,20 @@ WriteMaths.prototype = {
 
 			var dr = $('<p>'+txt.slice(0,startMath)+'</p>');
 			e.append(dr);
-			var w = $.textMetrics(dr).width;
+			var w = $.textMetrics(dr).width - this.scrollLeft;
+			console.log($.textMetrics(dr).width,this.scrollLeft,w);
 			dr.remove();
 			e.find('.preview')
 				.show()
 				.html(cleanJME(math))
-				.position({my: 'left bottom', at: 'left top', of: this, offset: w+' 0'})
+				.position({my: 'left bottom', at: 'left top', of: this, offset: w+' 0', collision: 'fit'})
 			;
 			var inp = this;
 			var queue = MathJax.Callback.Queue(MathJax.Hub.Register.StartupHook("End",{}));
 			queue.Push(['Typeset',MathJax.Hub,e.find('.preview')[0]]);
 			queue.Push(function() {
-				e.find('.preview').position({my: 'left bottom', at: 'left top', of: inp, offset: w+' 0'});
+				console.log(w,inp.scrollLeft);
+				e.find('.preview').position({my: 'left bottom', at: 'left top', of: inp, offset: w+' 0', collision: 'fit'});
 			});
 		}
 	
