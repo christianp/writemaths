@@ -7,7 +7,7 @@
 		<!-- MathJax -->
 		<SCRIPT SRC="http://cdn.mathjax.org/mathjax/latest/MathJax.js">
 		  MathJax.Hub.Config({
-			extensions: ['tex2jax.js',"TeX/AMSmath.js"],
+			extensions: ['tex2jax.js',"TeX/AMSmath.js","TeX/AMSsymbols.js"],
 			tex2jax: {inlineMath: [["$","$"],["\\(","\\)"]]},
 			jax: ["input/TeX","output/HTML-CSS"],
 			displayAlign: "center",
@@ -34,9 +34,38 @@
 		<script language="javascript">
 			var wm;
 			$(window).ready(function() {
+				var saveName = 'writemaths';
+				if(window.location && window.location.search)
+				{
+					saveName = window.location.search.slice(1);
+				}
+
+				$('#switch input, #saveas input').val(saveName);
+
+				//switch page
+				$('#switch').submit(function(e) {
+					e.stopPropagation();
+					e.preventDefault();
+					var name = $(this).find('input').val();
+					location.search = '?'+name;
+				});
+
+				//save current page under different name
+				$('#saveas').submit(function(e) {
+					e.stopPropagation();
+					e.preventDefault();
+					var name = $(this).find('input').val();
+					wm.saveName = name;
+					wm.saveState();
+					$('#switch input').val(name);
+					history.pushState({},'['+name+'] Write maths, see maths!','?'+name);
+				});
+
+				document.title = '['+saveName+'] Write maths, see maths!';
+
 				wm = new WriteMaths('#writemaths',{
 					display: '#printout',
-					saveName: 'writemaths'
+					saveName: saveName
 				});
 				$('#clear').click(function() {
 					wm.setState('');
@@ -54,6 +83,14 @@
 
 	</head>
 	<body>
+		<div id="nav">
+			<form id="switch">
+				<label for="input">Page: </label><input id="input" type="text"></input>
+			</form>
+			<form id="saveas">
+				<label for="input">Save as: </label><input id="input" type="text"></input>
+			</form>
+		</div>
 		<div id="writemaths">
 h1=. Write maths, see maths
 h2. Idea

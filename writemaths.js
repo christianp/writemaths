@@ -158,7 +158,6 @@ WriteMaths.prototype = {
 			var dr = $('<p>'+txt.slice(0,startMath)+'</p>');
 			e.append(dr);
 			var w = $.textMetrics(dr).width - this.scrollLeft;
-			console.log($.textMetrics(dr).width,this.scrollLeft,w);
 			dr.remove();
 			e.find('.preview')
 				.show()
@@ -169,7 +168,6 @@ WriteMaths.prototype = {
 			var queue = MathJax.Callback.Queue(MathJax.Hub.Register.StartupHook("End",{}));
 			queue.Push(['Typeset',MathJax.Hub,e.find('.preview')[0]]);
 			queue.Push(function() {
-				console.log(w,inp.scrollLeft);
 				e.find('.preview').position({my: 'left bottom', at: 'left top', of: inp, offset: w+' 0', collision: 'fit'});
 			});
 		}
@@ -198,6 +196,8 @@ WriteMaths.prototype = {
 			s = localStorage[this.saveName];
 			if(s)
 				this.setState(s);
+			var wm = this;
+			$.get('save.php',{name:this.saveName},function(data){wm.setState(data);});
 		}
 	},
 
@@ -225,8 +225,27 @@ WriteMaths.prototype = {
 	saveState: function() {
 		if(this.saveName)
 		{
-			var s = this.getState();
-			localStorage[this.saveName]= s.join('\n');
+			var s = this.getState().join('\n');
+			localStorage[this.saveName]= s;
+			this.tryPost(s);
+		}
+	},
+
+	tryPost: function(s) {
+		if(this.posting)
+		{
+			this.nextPost = s;
+		}
+		else
+		{
+			delete this.nextPost;
+			var wm = this;
+			this.posting = true;
+			$.post('save.php',{name: this.saveName, content: s},function(){
+				wm.posting = false;
+				if(wm.nextPost)
+					wm.tryPost(wm.nextPost);
+			});
 		}
 	},
 

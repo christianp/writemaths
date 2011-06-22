@@ -36,3 +36,14 @@
 	display: none;
 }
 
+#nav {
+	text-align: right;
+	font-weight: bold;
+	font-size: 150%;
+}
+#nav form {
+	display: inline;
+}
+#nav input {
+	font-size: 100%;
+}
