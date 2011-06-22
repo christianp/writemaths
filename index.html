@@ -34,7 +34,7 @@
 		<script language="javascript">
 			var wm;
 			$(window).ready(function() {
-				var saveName = 'writemaths';
+				var saveName = 'help';
 				if(window.location && window.location.search)
 				{
 					saveName = window.location.search.slice(1);
@@ -50,15 +50,20 @@
 					location.search = '?'+name;
 				});
 
+				var url = window.location.href;
+				$('#url').attr('href',url).html(url);
+
 				//save current page under different name
 				$('#saveas').submit(function(e) {
 					e.stopPropagation();
 					e.preventDefault();
-					var name = $(this).find('input').val();
-					wm.saveName = name;
+					saveName = $(this).find('input').val();
+					wm.saveName = saveName;
 					wm.saveState();
-					$('#switch input').val(name);
-					history.pushState({},'['+name+'] Write maths, see maths!','?'+name);
+					$('#switch input').val(saveName);
+					var url = window.location.href;
+					$('#url').attr('href',url).html(url);
+					history.pushState({},'['+saveName+'] Write maths, see maths!','?'+saveName);
 				});
 
 				document.title = '['+saveName+'] Write maths, see maths!';
@@ -79,11 +84,15 @@
 			});
 		</script>
 
+		<link rel="stylesheet" type="text/css" href="reset.css" />
+		<link rel="stylesheet" type="text/css" href="typography.css" />
 		<link rel="stylesheet" type="text/css" href="writemaths.css" />
 
 	</head>
 	<body>
 		<div id="nav">
+			<span>This page's URL: <a id="url"></a></span>
+			<a href="?help">Help</a>
 			<form id="switch">
 				<label for="input">Page: </label><input id="input" type="text"></input>
 			</form>
