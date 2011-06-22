@@ -27,6 +27,7 @@ if($db = sqlite_open('maths.sqlite',0666,$sqlite_error))
 	{
 		$name = $_POST['name'];
 		$content = stripslashes($_POST['content']);
+		if($name != 'help')
 			saveMaths($name,$content);
 	}
 
