@@ -40,30 +40,72 @@
 					saveName = window.location.search.slice(1);
 				}
 
-				$('#switch input, #saveas input').val(saveName);
-
 				//switch page
 				$('#switch').submit(function(e) {
 					e.stopPropagation();
 					e.preventDefault();
 					var name = $(this).find('input').val();
-					location.search = '?'+name;
+					changeSaveName(name);
+					wm.load();
+					$(this).find('input').blur();
 				});
 
-				var url = window.location.href;
-				$('#url').attr('href',url).html(url);
+				$(window).bind('popstate',function(e) {
+					var name = window.location.search.slice(1);
+					if(name)
+						changeSaveName(name,true);
+					wm.load();
+				});
+
+				function changeSaveName(name,nopush)
+				{
+					if(!nopush && name!=saveName)
+						history.pushState({name: name},'['+name+'] Write maths, see maths!','?'+name);
+					wm.saveName = saveName = name;
+					$('#switch input, #saveas input').val(saveName);
+					$('#switch input').val(saveName);
+					var url = window.location.href;
+					$('#url').attr('href',url).html(url);
+
+					//recent pages auto-complete doodah
+					var recent;
+					try {
+						recent = JSON.parse(localStorage['writemathsrecent']);
+					}
+					catch(e) {
+						recent = [];
+					}
+					if( (i=recent.indexOf(saveName)) >= 0 )
+					{
+						recent.splice(i,1);
+					}
+					recent.splice(0,0,saveName);
+					recent = recent.slice(0,6);
+
+					localStorage['writemathsrecent'] = JSON.stringify(recent);
+
+					$('#switch input')
+						.autocomplete({
+							source: recent,
+							minLength: 0,
+							delay: 0,
+							select: function(event,ui) { $(this).val(ui.item.value).submit(); }
+						})
+						.click(function() {
+
+						})
+						.focus(function() { this.select(); $(this).autocomplete('search','')})
+						.mouseup(function(){ return false; })
+					;
+				}
 
 				//save current page under different name
 				$('#saveas').submit(function(e) {
 					e.stopPropagation();
 					e.preventDefault();
-					saveName = $(this).find('input').val();
+					changeSaveName($(this).find('input').val());
 					wm.saveName = saveName;
 					wm.saveState();
-					$('#switch input').val(saveName);
-					var url = window.location.href;
-					$('#url').attr('href',url).html(url);
-					history.pushState({},'['+saveName+'] Write maths, see maths!','?'+saveName);
 				});
 
 				document.title = '['+saveName+'] Write maths, see maths!';
@@ -72,6 +114,9 @@
 					display: '#printout',
 					saveName: saveName
 				});
+
+				changeSaveName(saveName);
+
 				$('#clear').click(function() {
 					wm.setState('');
 					wm.saveState();
@@ -84,6 +129,7 @@
 			});
 		</script>
 
+		<link rel="stylesheet" type="text/css" href="jquery-ui.css" />
 		<link rel="stylesheet" type="text/css" href="reset.css" />
 		<link rel="stylesheet" type="text/css" href="typography.css" />
 		<link rel="stylesheet" type="text/css" href="writemaths.css" />
