@@ -23,7 +23,7 @@ a {
 	text-indent: 1em
 }
 .writemaths textarea, .writemaths input, .writemaths p, .writemaths h1, .writemaths h2, .writemaths h3, .writemaths h4, .writemaths h5, .writemaths h6 {
-	width: 100%;
+	width: 99%;
 	margin: 0.1em 0;
 	padding: 0.1em 0.2em;
 }
@@ -57,7 +57,7 @@ a {
 	margin-top: 0;
 	margin-left: 0;
 	margin-right: 0;
-	width: 100%;
+	width: 99%;
 	font-family: sans-serif;
 }
 #nav form {
