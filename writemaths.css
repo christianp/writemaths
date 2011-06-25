@@ -2,6 +2,7 @@
 body {
 	font-size:100%;
 	color: #111;
+	padding: 0;
 }
 a:focus, a:hover { 
 	color: #00f; 
@@ -68,4 +69,24 @@ a {
 
 #nav > * {
 	margin: 0 1em;
+}
+
+@media print {
+	body {
+		font-size: 12pt;
+		background: white;
+		font-color: black;
+	}
+
+	.writemaths p, .writemaths h1, .writemaths h2, .writemaths h3, .writemaths h4, .writemaths h5, .writemaths h6 {
+		background: white;
+	}
+
+	.writemaths {
+		font-size: 100%;
+	}
+
+	#nav, #controls {
+		display: none;
+	}
 }
