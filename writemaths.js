@@ -375,6 +375,7 @@ function finishParagraph(p) {
 			.construct(src)
 		;
 	});
+	p.linkURLs().find('a').oembed()
 }
 
 function input2display(e) {
@@ -383,6 +384,16 @@ function input2display(e) {
 	e.replaceWith(d);
 	finishParagraph(d);
 	return d;
+}
+
+
+var urlexp = /(^|\s)(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])($|\s)/ig;
+
+$.fn.linkURLs = function() {
+	this.each(function() {
+		$(this).html($(this).html().replace(urlexp,"$1<a href='$2'>$2</a>$4")); 
+	});
+	return this;
 }
 
 var textile;
