@@ -61,7 +61,12 @@
 				function changeSaveName(name,nopush)
 				{
 					if(!nopush && name!=saveName)
-						history.pushState({name: name},'['+name+'] Write maths, see maths!','?'+name);
+					{
+						if(history && history.pushState)
+							history.pushState({name: name},'['+name+'] Write maths, see maths!','?'+name);
+						else
+							document.location = '?'+name;
+					}
 					wm.saveName = saveName = name;
 					$('#switch input, #saveas input').val(saveName);
 					$('#switch input').val(saveName);
@@ -71,7 +76,7 @@
 					//recent pages auto-complete doodah
 					var recent;
 					try {
-						recent = JSON.parse(localStorage['writemathsrecent']);
+						recent = JSON.parse(localStorage['writemathsrecent']) || [];
 					}
 					catch(e) {
 						recent = [];
