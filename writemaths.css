@@ -13,7 +13,7 @@ a {
 }
 
 .writemaths {
-	font-size:150%;
+	font-size:125%;
 	font-family: serif;
 }
 .writemaths p, .writemaths h1, .writemaths h2, .writemaths h3, .writemaths h4, .writemaths h5, .writemaths h6 {
@@ -67,6 +67,10 @@ a {
 
 #nav > * {
 	margin: 0 1em;
+}
+
+#nav a:hover {
+	cursor: pointer;
 }
 
 #switch, #saveas {
