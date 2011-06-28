@@ -60,6 +60,7 @@
 
 				function changeSaveName(name,nopush)
 				{
+					wm.setState('');
 					if(!nopush && name!=saveName)
 					{
 						if(history && history.pushState)
@@ -85,7 +86,8 @@
 					{
 						recent.splice(i,1);
 					}
-					recent.splice(0,0,saveName);
+					if(!saveName.match(/tmp\d+/))
+						recent.splice(0,0,saveName);
 					recent = recent.slice(0,6);
 
 					localStorage['writemathsrecent'] = JSON.stringify(recent);
@@ -110,8 +112,12 @@
 					e.stopPropagation();
 					e.preventDefault();
 					changeSaveName($(this).find('input').val());
-					wm.saveName = saveName;
 					wm.saveState();
+				});
+
+				$('#newpage').click(function() {
+					name = 'tmp'+(new Date()).getTime();
+					changeSaveName(name);
 				});
 
 				document.title = '['+saveName+'] Write maths, see maths!';
@@ -145,41 +151,15 @@
 		<div id="nav">
 			<span>This page's URL: <a id="url"></a></span>
 			<a href="?help">Help</a>
+			<a id="newpage">New Page</a>
 			<form id="switch">
-				<label for="input">Page: </label><input id="input" type="text"></input>
+				<label for="input">Load Page: </label><input id="input" type="text"></input>
 			</form>
 			<form id="saveas">
 				<label for="input">Save as: </label><input id="input" type="text"></input>
 			</form>
 		</div>
 		<div id="writemaths">
-h1=. Write maths, see maths
-h2. Idea
-_Write maths, see maths_ is a sort-of-WYSIWYG editor for maths on the web.
-It was created by "Christian Perfect":http://checkmyworking.com
-
-h2. Input
-Click on a line of text to edit it.
-Press enter for a new paragraph.
-Use the cursor keys to move between paragraphs quickly.
-Write $m + a + t +h/s$
-or ${\LaTeX}$
-or "Textile":http://textile.thresholdstate.com
-
-h2. Maths
-Enclose maths in dollar signs, or in escaped square brackets for display mode: $e^(pi i)+1=0$ \[ e^(pi i) + 1 = 0 \]
-Maths is converted from a simple (BASIC-style) syntax to LaTeX automatically. To keep raw LaTeX, enclose it in curly braces: \[ 1/2 {+ \sum_1^N \left( \frac{1}{n} \right) +} abs(y) \]
-
-h2. Output
-Click on the "Show HTML" button to get something you can copy and paste into a blog post or other web page (requires MathJax to be loaded on the page you paste it into)
-
-h2. Graphs
-Insert geometric drawings by writing "JessieScript":http://jsxgraph.uni-bayreuth.de/distrib/jessiescript_ref_en.pdf between double percent signs.
-The triangle $ABC$ has centre $M$. 
-%%A(1,1);B(-1,1);C(0,-1);[AB];[AC];[BC];D=1/2(A,B);E=1/2(A,C);F=1/2(B,C);]CD[;]BE[;]AF[;M=[CD]&[AF];%%
-The equation of the circle with midpoint $(1,1)$ and radius $2$
-%%A(1,1);k(A,2)%%
-is \[ (x-1)^2+(y-1)^2 = 4 \]
 		</div>
 		<div id="controls">
 			<input type="button" value="Clear" id="clear"/>
