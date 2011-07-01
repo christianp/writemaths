@@ -8,4 +8,4 @@ Text can be formatted using [Textile](http://textile.thresholdstate.com)
 
 The editor exports nice clean HTML for easy pasting into things like blog posts.
 
-[Click here to use write maths, see maths](http://checkmyworking.com/misc/writemaths).
+[Click here to use write maths, see maths](http://takenot.es).
