@@ -78,7 +78,9 @@ $(window).ready(function() {
 	$('#saveas').submit(function(e) {
 		e.stopPropagation();
 		e.preventDefault();
+		var s = wm.getState().join('\n');
 		changeSaveName($(this).find('input').val());
+		wm.setState(s);
 		wm.saveState();
 	});
 
