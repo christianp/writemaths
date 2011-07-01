@@ -1,17 +1,3 @@
-/*override some things from blueprint.css */
-body {
-	font-size:100%;
-	color: #111;
-	padding: 0;
-	overflow-x: hidden;
-}
-a:focus, a:hover { 
-	color: #00f; 
-}
-a {
-	text-decoration: underline;
-}
-
 .writemaths {
 	font-size:125%;
 	font-family: serif;
@@ -54,48 +40,3 @@ a {
 	display: none;
 }
 
-#nav {
-	text-align: right;
-	font-size: 120%;
-	background: #b0e0e6;
-	padding: 0.25em;
-	margin-top: 0;
-	margin-left: 0;
-	margin-right: 0;
-	width: 100%;
-	font-family: sans-serif;
-}
-#nav input {
-	font-size: 100%;
-}
-
-#nav > * {
-	margin: 0 1em;
-}
-
-#nav a:hover {
-	cursor: pointer;
-}
-
-#switch, #saveas {
-	display: inline-block;
-}
-@media print {
-	body {
-		font-size: 12pt;
-		background: white;
-		font-color: black;
-	}
-
-	.writemaths p, .writemaths h1, .writemaths h2, .writemaths h3, .writemaths h4, .writemaths h5, .writemaths h6 {
-		background: white;
-	}
-
-	.writemaths {
-		font-size: 100%;
-	}
-
-	#nav, #controls {
-		display: none;
-	}
-}
