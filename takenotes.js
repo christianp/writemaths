@@ -26,10 +26,11 @@ $(window).ready(function() {
 	function changeSaveName(name,nopush)
 	{
 		wm.setState('');
+		var title = document.title = '['+name+'] takenot.es'
 		if(!nopush && name!=saveName)
 		{
 			if(history && history.pushState)
-				history.pushState({name: name},'['+name+'] Write maths, see maths!','?'+name);
+				history.pushState({name: name},title,'?'+name);
 			else
 				document.location = '?'+name;
 		}
@@ -85,8 +86,6 @@ $(window).ready(function() {
 		name = 'tmp'+(new Date()).getTime();
 		changeSaveName(name);
 	});
-
-	document.title = '['+saveName+'] Write maths, see maths!';
 
 	wm = new WriteMaths('#writemaths',{
 		display: '#printout',
