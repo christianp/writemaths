@@ -536,7 +536,7 @@ function input2display(e) {
 }
 
 
-var urlexp = /(^|\s)(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])($|\s)/ig;
+var urlexp = /(^|\s)(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])($|\s|[!:,.;])/ig;
 
 $.fn.linkURLs = function() {
 	this.each(function() {

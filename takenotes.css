@@ -12,6 +12,10 @@ a {
 	text-decoration: underline;
 }
 
+.writemaths {
+	width: 99%;
+}
+
 #nav {
 	text-align: right;
 	font-size: 120%;
