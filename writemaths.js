@@ -274,6 +274,7 @@ WriteMaths.prototype = {
 		for(var i=0;i<lines.length;i++)
 		{
 			var h = makeParagraph(lines[i],true);
+			h.linkURLs().find('a').oembed();
 			h.removeAttr('source');
 			var el = h.get(0);
 			if(h.find('br').length)
