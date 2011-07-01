@@ -5,7 +5,7 @@ function WriteMaths(e,options)
 	e=$(e);
 	e.addClass('writemaths');
 	this.e = e;
-	this.d = $(options.display);
+	this.d = options.display;
 	this.saveName = options.saveName;
 	
 	this.bindEvents();
@@ -20,10 +20,10 @@ function WriteMaths(e,options)
 WriteMaths.numGraphs = 0;
 
 WriteMaths.prototype = {
+	outputMode: 'html',
 	bindEvents: function() {
 		var wm = this;
 		var e = this.e;
-		var d = this.d;
 
 		//clicking on a paragraph makes it editable
 		e.delegate('p, :header','click',function(e) {
@@ -178,7 +178,7 @@ WriteMaths.prototype = {
 			wm.saveState();
 		});
 		e.delegate('textarea, input','input',function() {
-			wm.getHTML();
+			wm.output();
 		});
 
 		e.delegate('textarea, input','blur',function() {
@@ -249,20 +249,50 @@ WriteMaths.prototype = {
 		}
 	},
 
+	output: function() {
+		var source;
+		switch(this.outputMode)
+		{
+		case 'html':
+			source = this.getHTML();
+			break;
+		case 'tex':
+			source = this.getTeX();
+			break;
+		}
+
+		$(this.d)
+			.width('100%')
+			.attr('rows',source.split('\n').length)
+			.html(source)
+		;
+	},
+
 	getHTML: function() {
 		var d = $('<div/>');
 		var lines = this.getState();
 		for(var i=0;i<lines.length;i++)
 		{
-			d.append(makeParagraph(lines[i],true));
+			var h = makeParagraph(lines[i],true);
+			h.removeAttr('source');
+			var el = h.get(0);
+			if(h.find('br').length)
+			{
+				lines[i]='';
+			}
+			else if( (el.tagName.toLowerCase()=='p') && !el.attributes.length )
+			{
+				lines[i] = h.html();
+			}
+			else
+			{
+				var d=$('<div/>');
+				d.append(h);
+				lines[i] =  d.html();
+			}
 		}
-		d.find('p, :header').removeAttr('source');
-		var html = style_html(d.html(),1,'\t');
-		this.d
-			.html(html)
-			.width('100%')
-			.attr('rows',html.split('\n').length)
-		;
+		html = lines.join('\n\n');
+		return html;
 	},
 
 	getTeX: function() {
@@ -285,13 +315,9 @@ WriteMaths.prototype = {
 \\parskip 1ex \n\
 \\parindent 0pt \n\
 \n\
-\\begin{document}\n'+tex+'\n\\end{document}';
+\\begin{document}\n\n'+tex+'\n\n\\end{document}';
 
-		this.d
-			.html(tex)
-			.width('100%')
-			.attr('rows',tex.split('\n').length)
-		;
+		return tex;
 	}
 };
 

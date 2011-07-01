@@ -70,6 +70,7 @@ $(window).ready(function() {
 			.focus(function() { this.select(); $(this).autocomplete('search','')})
 			.mouseup(function(){ return false; })
 		;
+		wm.output();
 	}
 
 	//save current page under different name
@@ -98,23 +99,38 @@ $(window).ready(function() {
 		wm.setState('');
 		wm.saveState();
 	});
-	$('#togglehtml').click(function() {
-		wm.debugMode = wm.debugMode=='html' ? '' : 'html';
-		if(wm.debugMode=='html')
+
+	function toggleOutputMode(mode) {
+		if(mode==undefined)
+			wm.outputMode = wm.outputMode=='html' ? 'tex' : 'html';
+		else
+			wm.outputMode = mode;
+		wm.output();
+
+		var t = wm.outputMode=='html' ? 'TeX' : 'HTML';
+		$('#toggleoutputmode').val(t+' please');
+	}
+	$('#toggleoutputmode').click(function(){toggleOutputMode();});
+
+	function toggleOutput() {
+		$('#printout').toggle();
+		var t;
+		if($('#printout').is(':visible'))
 		{
-			wm.getHTML();
+			t = 'Hide the source';
+			$('#toggleoutputmode').show();
+			wm.output();
+			$('body').animate({scrollTop:$('#printout').offset().top-100},200);
 		}
-		var t = $('#printout').toggle().is(':visible') ? 'Hide HTML' : 'Show HTML';
-		$('#togglehtml').val(t);
-	});
-	$('#toggletex').click(function() {
-		wm.debugMode = wm.debugMode=='tex' ? '' : 'tex';
-		if(wm.debugMode=='tex')
+		else
 		{
-			wm.getTeX();
+			t = 'Show the source';
+			$('#toggleoutputmode').hide();
 		}
-		var t = $('#printout').toggle().is(':visible') ? 'Hide HTML' : 'Show HTML';
-		$('#togglehtml').val(t);
-	});
+		$('#toggleoutput').val(t);
+	}
+	$('#toggleoutput').click(toggleOutput);
+	toggleOutputMode('html');
+	toggleOutput();toggleOutput();
 
 });

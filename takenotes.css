@@ -35,6 +35,11 @@ a {
 	cursor: pointer;
 }
 
+#controls hr {
+	border: 1px solid powderblue;
+	margin: 0.5em 1em;
+}
+
 #switch, #saveas {
 	display: inline-block;
 }
