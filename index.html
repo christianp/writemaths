@@ -134,10 +134,24 @@
 					wm.saveState();
 				});
 				$('#togglehtml').click(function() {
-					wm.getHTML();
+					wm.debugMode = wm.debugMode=='html' ? '' : 'html';
+					if(wm.debugMode=='html')
+					{
+						wm.getHTML();
+					}
 					var t = $('#printout').toggle().is(':visible') ? 'Hide HTML' : 'Show HTML';
 					$('#togglehtml').val(t);
 				});
+				$('#toggletex').click(function() {
+					wm.debugMode = wm.debugMode=='tex' ? '' : 'tex';
+					if(wm.debugMode=='tex')
+					{
+						wm.getTeX();
+					}
+					var t = $('#printout').toggle().is(':visible') ? 'Hide HTML' : 'Show HTML';
+					$('#togglehtml').val(t);
+				});
+
 			});
 		</script>
 
@@ -164,6 +178,7 @@
 		<div id="controls">
 			<input type="button" value="Clear" id="clear"/>
 			<input type="button" value="Show HTML" id="togglehtml"/>
+			<input type="button" value="Show LaTeX" id="toggletex"/>
 			<textarea id="printout" style="display:none;"></textarea>
 		</div>
 	</body>

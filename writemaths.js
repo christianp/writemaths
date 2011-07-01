@@ -264,7 +264,126 @@ WriteMaths.prototype = {
 			.attr('rows',html.split('\n').length)
 		;
 	},
+
+	getTeX: function() {
+		var lines = this.getState();
+		for(var i=0;i<lines.length;i++)
+		{
+			var p = makeParagraph(lines[i],true);
+			p.linkURLs();
+			lines[i] = p.get(0);
+		}
+		var tex = $.map(lines,htmlToTeX).join('\n\n');
+		tex = '\
+\\documentclass[a4paper]{article} \n\
+\\usepackage{amsmath} \n\
+\\usepackage{amssymb} \n\
+\\usepackage{upgreek} \n\
+\\usepackage{amsthm} \n\
+\\usepackage{verbatim} \n\
+\\usepackage{hyperref} \n\
+\\parskip 1ex \n\
+\\parindent 0pt \n\
+\n\
+\\begin{document}\n'+tex+'\n\\end{document}';
+
+		this.d
+			.html(tex)
+			.width('100%')
+			.attr('rows',tex.split('\n').length)
+		;
+	}
 };
+
+var htmlToTeX;
+(function() {
+	function environ(name)
+	{
+		return function(content) {
+			return '\\'+name+'{'+content+'}';
+		};
+	}
+
+	function inline(name)
+	{
+		return function(content) {
+			return '{\\'+name+' '+content+'}';
+		};
+	}
+	
+	function id(content)
+	{
+		return content;
+	}
+
+	var htmlTeXdict = {
+		'em':		inline('it'),
+		'i': 		inline('it'),
+		'strong':	inline('bf'),
+		'b':		inline('bf'),
+		'cite':		environ('cite'),
+		'del':		environ('sout'),
+		'ins':		environ('underline'),
+		'sup':		environ('textsuperscript'),
+		'sub':		environ('textsubscript'),
+		'span':		id,
+		'p':		id,
+		'br':		id,
+		'div':		id,
+		'code':		environ('verb'),
+		'h1':		function(content) {
+						return '\\title{'+content+'}\n\\maketitle';
+					},
+		'h2':		environ('section'),
+		'h3':		environ('subsection'),
+		'h4':		environ('subsubsection'),
+		'a':		function(content,el) {
+						return '\\href{'+$(el).attr('href')+'}{'+content+'}';
+					}
+	};
+
+	var unicode1 = {
+		'\u2019': '\'',
+		'\u201C': '``',
+		'\u201D': '"',
+		'\u2013': ' - ',
+		'\u2014': ' -- ',
+		'\u00D7': ' x ',
+		'\u2026': '...',
+		'\u00A9': '\\copyright ',
+		'\u00AE': '\\textregistered ',
+		'\u2122': '\\texttrademark'
+	};
+	var unicode = {};
+	for(var x in unicode1) { unicode[x] = [new RegExp(x,'g'),unicode1[x]]; }
+
+	htmlToTeX = function(el)
+	{
+		switch(el.nodeType)
+		{
+		case 1:
+			var content = $(el).contents();
+			content = $.map(content,htmlToTeX).join('');
+			for(var x in unicode)
+			{
+				var r = unicode[x][0];
+				var to = unicode[x][1];
+				content = content.replace(r,to);
+			}
+			var name = el.tagName.toLowerCase();
+			if(name in htmlTeXdict)
+			{
+				return htmlTeXdict[name](content,el);
+			}
+			else
+			{
+				return '';
+			}
+		case 3:
+			return $(el).text();
+		}
+	}
+})();
 
 function texMaths(s) {
 	var bits = Numbas.jme.splitbrackets(s,'{','}');
@@ -359,22 +478,25 @@ function cleanJME(val)
 }
 
 function finishParagraph(p) {
-	p.find('.graph').each(function() {
-		var id = $(this).attr('id');
-		var src = $(this).attr('source');
-		$(this).css('width','400px').css('height','300px');
-		JXG.JSXGraph
-			.initBoard(id,{
-				showCopyright:false,
-				originX: 200,
-				originY: 150,
-				unitX: 50,
-				unitY: 50,
-				axis:true
-			})
-			.construct(src)
-		;
-	});
+	try{
+		p.find('.graph').each(function() {
+			var id = $(this).attr('id');
+			var src = $(this).attr('source');
+			$(this).css('width','400px').css('height','300px');
+			JXG.JSXGraph
+				.initBoard(id,{
+					showCopyright:false,
+					originX: 200,
+					originY: 150,
+					unitX: 50,
+					unitY: 50,
+					axis:true
+				})
+				.construct(src)
+			;
+		});
+	}
+	catch(e) {}
 	p.linkURLs().find('a').oembed()
 }
 
