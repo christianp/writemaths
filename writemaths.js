@@ -197,7 +197,7 @@ WriteMaths.prototype = {
 			if(s)
 				this.setState(s);
 			var wm = this;
-			$.get('save.php',{name:this.saveName},function(data){wm.setState(data);});
+			$.get('save.php',{name:btoa(this.saveName)},function(data){wm.setState(data);});
 		}
 	},
 
@@ -241,7 +241,7 @@ WriteMaths.prototype = {
 			delete this.nextPost;
 			var wm = this;
 			this.posting = true;
-			$.post('save.php',{name: this.saveName, content: s},function(){
+			$.post('save.php',{name: btoa(this.saveName), content: btoa(s)},function(){
 				wm.posting = false;
 				if(wm.nextPost)
 					wm.tryPost(wm.nextPost);

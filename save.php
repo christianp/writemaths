@@ -24,13 +24,13 @@ function getMaths($name)
 
 if($_GET)
 {
-	$name = $_GET['name'];
+	$name = base64_decode($_GET['name']);
 	echo getMaths($name);
 }
 else if($_POST)
 {
-	$name = $_POST['name'];
-	$content = stripslashes($_POST['content']);
+	$name = base64_decode($_POST['name']);
+	$content = base64_decode(stripslashes($_POST['content']));
 	saveMaths($name,$content);
 }
 ?>
