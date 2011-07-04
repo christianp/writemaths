@@ -18,6 +18,12 @@
 .writemaths p {
 	text-indent: 1em
 }
+
+.writemaths code {
+	font-size: 80%;
+	background: #f3f3f3;
+}
+
 .writemaths textarea, .writemaths input, .writemaths p, .writemaths h1, .writemaths h2, .writemaths h3, .writemaths h4, .writemaths h5, .writemaths h6 {
 	width: 100%;
 	margin: 0.1em 0;
