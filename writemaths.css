@@ -2,6 +2,11 @@
 	font-size:125%;
 	font-family: serif;
 }
+
+.writemaths h1 {
+	text-align: center;
+}
+
 .writemaths p, .writemaths h1, .writemaths h2, .writemaths h3, .writemaths h4, .writemaths h5, .writemaths h6 {
 	background: #fefefe;
 	min-height: 1em;
