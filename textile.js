@@ -84,9 +84,6 @@ var textile;
 				nspan[i] = this.convertGlyphs(nspan[i]);
 			}
 
-			//find HTML tags so they don't get touched
-			//span = nspan + this.convertGlyphs(span);
-
 			return nspan.join('');
 		},
 
@@ -97,7 +94,7 @@ var textile;
 			index = Math.min(index,arr1.length)
 			if(index % 2)
 			{
-				arr1[index-1] = arr2[0];
+				arr1[index-1] += arr2[0];
 				arr2 = arr2.slice(1);
 			}
 			if(arr2.length % 2 && index<arr1.length &&  arr2.length>1)
@@ -113,6 +110,13 @@ var textile;
 			{
 				txt = txt.replace(glyphRules[i][0],glyphRules[i][1]);
 			}
+			//escape < and >
+			var bits = txt.split(/(<[^<]+?>)/);
+			for(var i=0;i<bits.length;i+=2)
+			{
+				bits[i] = bits[i].replace('<','&#60;').replace('>','&#62;');
+			}
+			txt = bits.join('');
 			return txt;
 		},
 
@@ -133,7 +137,7 @@ var textile;
 
 	var para = TextileConverter.prototype.makeTag('p');
 
-	var re_simpleTag = /<.*?>/g;
+	var re_simpleTag = /<[^<]+?>/g;
 	var re_punct = /[!"#$%&\'()*+,\-./:;<=>?@[\\\]^_`{|}~]/;
 	var glyphRules = [
 		[/\n(?! )/g,'<br />\n'],															//insert HTML newlines
@@ -253,58 +257,10 @@ var textile;
 	//Functions are called with respect to the TextileConvertor object, so can use things like this.makeTag
 	var phraseTypes = textile.phraseTypes = [];
 
-	var re_inlineMaths = /\$.*?\$/g;
-	phraseTypes.push(function(text) {
-		var out = [];
-		var m;
-		while(m=re_inlineMaths.exec(text))
-		{
-			var bit = [text.slice(0,m.index),m[0]];
-			out = this.joinPhraseBits(out,bit,out.length);
-			text = text.slice(re_inlineMaths.lastIndex);
-			re_inlineMaths.lastIndex = 0;
-		}
-		if(out.length)
-			out[out.length-1] += text;
-		return out;
-	});
-
-	var re_displayMaths = /\\\[.*?\\\]/g;
-	phraseTypes.push(function(text) {
-		var out = [];
-		var m;
-		while(m=re_displayMaths.exec(text))
-		{
-			var bit = [text.slice(0,m.index),m[0]];
-			out = this.joinPhraseBits(out,bit,out.length);
-			text = text.slice(re_displayMaths.lastIndex);
-			re_displayMaths.lastIndex = 0;
-		}
-		if(out.length)
-			out[out.length-1] += text;
-		return out;
-	});
-
-	var re_jsxgraph = /\%.*?\%/g;
-	phraseTypes.push(function(text) {
-		var out = [];
-		var m;
-		while(m=re_jsxgraph.exec(text))
-		{
-			var bit = [text.slice(0,m.index),m[0]];
-			out = this.joinPhraseBits(out,bit,out.length);
-			text = text.slice(re_jsxgraph.lastIndex);
-			re_jsxgraph.lastIndex = 0;
-		}
-		if(out.length)
-			out[out.length-1] += text;
-		return out;
-	});
-
 	var shortPunct = '\\.,"\'?!;:';
 	function makeNormalPhraseType(start,tagName,protectContents)
 	{
-		var re = new RegExp('(?:^|\\{|\\[|(['+shortPunct+']|\\s))'+start+'(?:'+re_attr.source+' ?)?([^\\s'+start+']+|\\S[^'+start+'\\n]*[^\\s'+start+'\\n])'+start+'(?:$|[\\]}]|('+re_punct.source+'{1,2}|\\s))','g');
+		var re = new RegExp('(?:^|\\{|\\[|(['+shortPunct+']|\\s|>))'+start+'(?:'+re_attr.source+' ?)?([^\\s'+start+']+|\\S[^'+start+'\\n]*[^\\s'+start+'\\n])'+start+'(?:$|[\\]}]|('+re_punct.source+'{1,2}|\\s))','g');
 		return function(text) {
 			var out = [];
 			var m;
@@ -580,7 +536,7 @@ var textile;
 			this.out += tag.close;
 		}
 	};
-	//blockTypes.push(list);
+	blockTypes.push(list);
 
 	var re_table = new RegExp('^(table'+re_attr.source+'?\. *\\n)?(('+re_attr.source+'?\\. )?\\|.*\\|\\n?)+(?:\\n\\n|$)');
 	var re_tableRow = new RegExp('^(?:'+re_attr.source+'?\\. )?\\|.*\\|(?:\\n|$)');
