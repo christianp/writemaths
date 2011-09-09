@@ -97,8 +97,10 @@ $(window).ready(function() {
 	changeSaveName(saveName);
 
 	$('#clear').click(function() {
-		wm.setState('');
-		wm.saveState();
+		if(window.confirm("Are you sure you want to clear the page? There's no way of recovering it.")) {
+			wm.setState('');
+			wm.saveState();
+		}
 	});
 
 	function toggleOutputMode(mode) {
