@@ -251,7 +251,7 @@ WriteMaths.prototype = {
 			var p = makeParagraph(lines[i]);
 			if(p.is('ol,ul'))
 			{
-				p.removeClass('line');
+				p.removeClass('line').removeAttr('source');
 				p.children().addClass('line').attr('source',lines[i]);
 			}
 			if(p.is('ol,ul') && this.e.children(':first').is('ol,ul'))
@@ -489,6 +489,12 @@ function makeParagraph(val,notypeset)
 		var d = $('<p></p>');
 		var dval = cleanJME(val);
 		d = $(dval);
+		if(d.is('div'))
+		{
+			var p=$('<p></p>');
+			p.append(d);
+			d=p;
+		}
 		d.attr('source',val);
 		if(!notypeset)
 			MathJax.Hub.Queue(['Typeset',MathJax.Hub,d[0]]);
@@ -1122,4 +1128,53 @@ function style_html(html_source, indent_size, indent_character, max_char, brace_
  }
 
 })(jQuery);
+
+var re_inlineMaths = /\$.*?\$/g;
+textile.phraseTypes.splice(0,0,function(text) {
+	var out = [];
+	var m;
+	while(m=re_inlineMaths.exec(text))
+	{
+		var bit = [text.slice(0,m.index),m[0]];
+		out = this.joinPhraseBits(out,bit,out.length);
+		text = text.slice(re_inlineMaths.lastIndex);
+		re_inlineMaths.lastIndex = 0;
+	}
+	if(out.length)
+		out = this.joinPhraseBits(out,[text],out.length);
+	return out;
+});
+
+var re_displayMaths = /\\\[.*?\\\]/g;
+textile.phraseTypes.splice(0,0,function(text) {
+	var out = [];
+	var m;
+	while(m=re_displayMaths.exec(text))
+	{
+		var bit = [text.slice(0,m.index),m[0]];
+		out = this.joinPhraseBits(out,bit,out.length);
+		text = text.slice(re_displayMaths.lastIndex);
+		re_displayMaths.lastIndex = 0;
+	}
+	if(out.length)
+		out = this.joinPhraseBits(out,[text],out.length);
+	return out;
+});
+
+var re_jsxgraph = /%%.*?%%/g;
+textile.phraseTypes.splice(0,0,function(text) {
+	var out = [];
+	var m;
+	while(m=re_jsxgraph.exec(text))
+	{
+		var bit = [text.slice(0,m.index),m[0]];
+		out = this.joinPhraseBits(out,bit,out.length);
+		text = text.slice(re_jsxgraph.lastIndex);
+		re_jsxgraph.lastIndex = 0;
+	}
+	if(out.length)
+		out = this.joinPhraseBits(out,[text],out.length);
+	return out;
+});
+
 })();
