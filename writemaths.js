@@ -1,4 +1,6 @@
-function WriteMaths(e,options)
+var WriteMaths;
+(function() {
+WriteMaths = function(e,options)
 {
 	if(!options)
 		options = {};
@@ -26,7 +28,7 @@ WriteMaths.prototype = {
 		var e = this.e;
 
 		//clicking on a paragraph makes it editable
-		e.delegate('p, :header','click',function(e) {
+		e.delegate('.line','click',function(e) {
 			var d = input();
 			d.val(($(this).attr('source') || '').trim());
 			$(this).replaceWith(d);
@@ -37,12 +39,35 @@ WriteMaths.prototype = {
 
 		//handle keypresses in input
 		e.delegate('textarea, input','keydown',function(ev) {
+			//find previous and next lines, in case they need to be used
+			var prvLine;
+			var i = $(this);
+			if(i.parent().is('ol,ul') && !i.prev().length)	//if current line is first list item, work with the list tag
+				i = i.parent();
+
+			if(i.prev().is('ol,ul'))	//if previous item is a list, select its last line
+				prvLine = i.prev().children('.line:last');
+			else	//otherwise, select previous normal line
+				prvLine = i.prev('.line');
+
+			var nxtLine;
+			var i = $(this);
+			if(i.parent().is('ol,ul') && !i.next().length)	//if current line is first list item, work with the list tag
+				i = i.parent();
+
+			if(i.next().is('ol,ul'))	//if nextious item is a list, select its last line
+				nxtLine = i.next().children('.line:first');
+			else	//otherwise, select nextious normal line
+				nxtLine = i.next('.line');
+
+			//which key was pressed?
 			switch(ev.which)
 			{
+			//backspace
 			case 8:
 				if(this.selectionStart==0 && this.selectionEnd==0)
 				{
-					var p = $(this).prev('p, :header');
+					var p = prvLine;
 					if(p.length)
 					{
 						var os = p.attr('source') || '';
@@ -57,29 +82,41 @@ WriteMaths.prototype = {
 					ev.preventDefault();
 				}
 				break;
+
+			//return
 			case 13:
 				$(this).attr('going',true);
 				var i = this.selectionStart;
-				var t = $(this).val().slice(i);
-				$(this).val( $(this).val().slice(0,i));
-				var d = input2display($(this));
-				var i = input();
+				var t = $(this).val().slice(i);		//text after cursor
+				$(this).val( $(this).val().slice(0,i));	//chop off text after cursor
+				var d = input2display($(this));	//replace input with display
+				var i = input();	//
 				i.val(t);
+				if(d.is('li'))
+				{
+
+				}
 				d.after(i);
 				i.focus();
 				i[0].setSelectionRange(0,0);
 				break;
+
+			//up
 			case 38:
-				$(this).prev('p, :header').click();
+				prvLine.click();
 				break;
+
+			//down
 			case 40:
-				$(this).next('p, :header').click();
+				nxtLine.click();
 				break;
+
+			//delete
 			case 46:
 				var val = $(this).val()
 				if(this.selectionStart==val.length && this.selectionEnd==val.length)
 				{
-					var p = $(this).next('p, :header');
+					var p = nxtLine;
 					if(p.length)
 					{
 						$(this).val(val+(p.attr('source') || ''));
@@ -90,6 +127,8 @@ WriteMaths.prototype = {
 					ev.preventDefault();
 				}
 				break;
+
+			//escape
 			case 27:
 				$(this).blur();
 			}
@@ -210,13 +249,24 @@ WriteMaths.prototype = {
 		while(i--)
 		{
 			var p = makeParagraph(lines[i]);
-			this.e.prepend(p);
+			if(p.is('ol,ul'))
+			{
+				p.removeClass('line');
+				p.children().addClass('line').attr('source',lines[i]);
+			}
+			if(p.is('ol,ul') && this.e.children(':first').is('ol,ul'))
+			{
+				p = p.find('li');
+				this.e.children(':first').prepend(p);
+			}
+			else
+				this.e.prepend(p);
 			finishParagraph(p);
 		}
 	},
 
 	getState: function() {
-		var lines = this.e.children('p, :header, textarea, input').map(function(){
+		var lines = this.e.children('.line, textarea, input').add('ol .line, ul .line').map(function(){
 			return ($(this).attr('source') || $(this).val());
 		}).toArray();
 		return lines;
@@ -438,12 +488,7 @@ function makeParagraph(val,notypeset)
 	{
 		var d = $('<p></p>');
 		var dval = cleanJME(val);
-		d.html(dval);
-		var c = d.children();
-		if(d.children('p, :header').length==c.length && c.length==1)
-		{
-			d=$(c[0]);
-		}
+		d = $(dval);
 		d.attr('source',val);
 		if(!notypeset)
 			MathJax.Hub.Queue(['Typeset',MathJax.Hub,d[0]]);
@@ -452,6 +497,7 @@ function makeParagraph(val,notypeset)
 	{
 		d = $('<p><br/></p>');
 	}
+	d.addClass('line');
 	return d;
 }
 function cleanJME(val)
@@ -530,7 +576,62 @@ function finishParagraph(p) {
 function input2display(e) {
 	var val = e.val();
 	var d = makeParagraph(val);
-	e.replaceWith(d);
+	var p;
+
+	//if this line is a list item
+	if(d.is('ol,ul'))
+	{
+		var l;
+		var li = d.find('li');
+		li.attr('source',d.attr('source')).addClass('line');
+		//if editing a list item, attach this line to the list
+		if((l=e.parent('ol,ul')).length)
+		{
+			e.replaceWith(li);
+		}
+		//if editing a previously non-list line, and there is a list above, attach this line to the list above
+		if((l=e.prev('ol,ul')).length)
+		{
+			l.append(li);
+			var l2
+			if((l2 = e.next('ol,ul')).length)	//if there's a list below, join it with this one
+			{
+				l.append(l2.children());
+				l2.remove();
+			}
+			e.remove();
+		}
+		//if editing a previously non-list line, and there is a list below, attach this line to the list below
+		else if((l=e.next('ol,ul')).length)
+		{
+			l.prepend(li);
+			e.remove();
+		}
+		//if created a list with nothing above or below, just make sure the list container tag isn't interpreted as an editable line
+		else
+		{
+			d.removeAttr('source').removeClass('line');
+			e.replaceWith(d);
+		}
+		d = li;
+	}
+	else if ((p=e.parent('ol,ul')).length)	//if this was a list item but is no longer, split the list.
+	{
+		var l2 = p.clone();
+		l2.children().remove();
+		l2.append(e.nextAll().remove());
+		if(l2.children().length)
+			p.after(l2);
+	
+		p.after(e);
+		e.replaceWith(d);
+		if(!p.children().length)
+			p.remove();
+	}
+	else
+	{
+		e.replaceWith(d);
+	}
 	finishParagraph(d);
 	return d;
 }
@@ -1021,3 +1122,4 @@ function style_html(html_source, indent_size, indent_character, max_char, brace_
  }
 
 })(jQuery);
+})();

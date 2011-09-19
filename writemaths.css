@@ -24,6 +24,14 @@
 	background: #f3f3f3;
 }
 
+.writemaths ol, .writemaths ul {
+	margin-left: 1em;
+}
+
+ol input, ul input {
+	margin-left: -1em;
+}
+
 .writemaths textarea, .writemaths input, .writemaths p, .writemaths h1, .writemaths h2, .writemaths h3, .writemaths h4, .writemaths h5, .writemaths h6 {
 	width: 100%;
 	margin: 0.1em 0;
