@@ -1,10 +1,59 @@
 var wm;
+var takenotes;
 $(window).ready(function() {
 	var saveName = 'help';
 	if(window.location && window.location.search)
 	{
 		saveName = window.location.search.slice(1);
 	}
+
+	if(localStorage['name'])
+		loggedin(localStorage['name']);
+
+	function loggedin(name)
+	{
+		$('#user #login').hide();
+		$('#user #info').show();
+		$('#user #info #name').html(name);
+	}
+
+	function logout()
+	{
+		delete localStorage['name'];
+		delete localStorage['token'];
+		$('#user #info').hide();
+		$('#user #login').show();
+	}
+
+	//login
+	$('#login input').keypress(function(e) {
+		if(e.which!=13)
+			return;
+
+		e.stopPropagation();
+		e.preventDefault();
+		$('#login').fadeOut(200);
+
+		var name = $('#login #name').val();
+		var password = $('#login #password').val();
+
+		$.post('user.php',{name: btoa(name), password: btoa(password)},function(token){
+			if(!token)
+			{
+				$('#login').stop(true,true).show();
+				alert('Incorrect password. If you were trying to create an account, there\'s already a user called '+name+'.');
+			}
+			else
+			{
+				localStorage['name'] = name;
+				localStorage['token'] = token;
+				loggedin(name);
+			}
+		});
+	});
+
+	//logout
+	$('#logout').click(logout);
 
 	//switch page
 	$('#switch').submit(function(e) {
@@ -89,9 +138,35 @@ $(window).ready(function() {
 		changeSaveName(name);
 	});
 
+	function loadfn()
+	{
+		var wm = this;
+		$.get('note.php',{name:btoa(this.saveName)},function(data){wm.setState(data);});
+	}
+
+	function savefn(s) {
+		if(this.posting)
+		{
+			this.nextPost = s;
+		}
+		else
+		{
+			delete this.nextPost;
+			var wm = this;
+			this.posting = true;
+			$.post('note.php',{name: btoa(this.saveName), content: btoa(s)},function(){
+				wm.posting = false;
+				if(wm.nextPost)
+					wm.savefn.apply(wm,wm.nextPost);
+			});
+		}
+	}
+
 	wm = new WriteMaths('#writemaths',{
 		display: '#printout',
-		saveName: saveName
+		saveName: saveName,
+		loadfn: loadfn,
+		savefn: savefn
 	});
 
 	changeSaveName(saveName);

@@ -2,6 +2,7 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+		<meta name="description" content="Write maths, see maths is a sort-of-WYSIWYG editor for maths on the web." />
 		<title>takenot.es</title>
 
 		<!-- MathJax -->
@@ -59,6 +60,15 @@
 	</head>
 	<body>
 		<div id="nav">
+			<div id="user">
+				<form id="login">
+					<label for="name">Username: </label><input id="name" type="text"></input>
+					<label for="password">Password: </label><input id="password" type="text"></input>
+				</form>
+				<div id="info">
+					<span id="name"></span> <span id="logout"><a id="logout">Log out</a></span>
+				</div>
+			</div>
 			<span>This page's URL: <a id="url"></a></span>
 			<a href="?help">Help</a>
 			<a id="newpage">New Page</a>

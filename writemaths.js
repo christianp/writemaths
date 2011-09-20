@@ -17,6 +17,10 @@ WriteMaths = function(e,options)
 		this.setState(options.content.trim());
 	else
 		this.setState(e.text().trim());
+
+	this.savefn = options.savefn || function(){};
+	this.loadfn = options.loadfn || function(){};
+
 	this.load();
 }
 WriteMaths.numGraphs = 0;
@@ -232,11 +236,11 @@ WriteMaths.prototype = {
 	load: function() {
 		if(this.saveName)
 		{
-			s = localStorage[this.saveName];
+			s = localStorage['writemaths.'+this.saveName];
 			if(s)
 				this.setState(s);
 			var wm = this;
-			$.get('save.php',{name:btoa(this.saveName)},function(data){wm.setState(data);});
+			this.loadfn.apply(this);
 		}
 	},
 
@@ -276,28 +280,11 @@ WriteMaths.prototype = {
 		if(this.saveName)
 		{
 			var s = this.getState().join('\n');
-			localStorage[this.saveName]= s;
-			this.tryPost(s);
+			localStorage['writemaths.'+this.saveName]= s;
+			this.savefn.apply(this,[s]);
 		}
 	},
 
-	tryPost: function(s) {
-		if(this.posting)
-		{
-			this.nextPost = s;
-		}
-		else
-		{
-			delete this.nextPost;
-			var wm = this;
-			this.posting = true;
-			$.post('save.php',{name: btoa(this.saveName), content: btoa(s)},function(){
-				wm.posting = false;
-				if(wm.nextPost)
-					wm.tryPost(wm.nextPost);
-			});
-		}
-	},
 
 	output: function() {
 		var source;

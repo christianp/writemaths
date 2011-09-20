@@ -27,6 +27,18 @@ a {
 	width: 100%;
 	font-family: sans-serif;
 }
+#nav #user {
+	float:left;
+}
+#user #info {
+	display: none;
+}
+#user #logout {
+	margin-left: 1em;
+}
+#login input {
+	width: 6em;
+}
 #nav input {
 	font-size: 100%;
 }
