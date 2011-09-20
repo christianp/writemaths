@@ -269,7 +269,20 @@ WriteMaths.prototype = {
 		var lines = this.e.children('.line, textarea, input').add('ol .line, ul .line').map(function(){
 			return ($(this).attr('source') || $(this).val());
 		}).toArray();
-		return lines;
+		var nlines = [];
+		for(var i=0;i<lines.length;i++)
+		{
+			var line = lines[i];
+			for(var j=i;j<lines.length && lines[j].search(/^[\*#] /)==0; j++) {}
+			if(j>i)
+			{
+				line = lines.slice(i,j).join('\n');
+				i=j-1;
+			}
+				
+			nlines.push(line);
+		}
+		return nlines;
 	},
 
 	saveState: function() {
@@ -325,7 +338,9 @@ WriteMaths.prototype = {
 		{
 			var h = makeParagraph(lines[i],true);
 			h.linkURLs().find('a').oembed();
-			h.removeAttr('source');
+			h.removeAttr('source').removeClass('line');
+			if(!h.attr('class').length)
+				h.removeAttr('class');
 			var el = h.get(0);
 			if(h.find('br').length)
 			{
@@ -416,7 +431,16 @@ var htmlToTeX;
 		'h4':		environ('subsubsection'),
 		'a':		function(content,el) {
 						return '\\href{'+$(el).attr('href')+'}{'+content+'}';
-					}
+					},
+		'li':		function(content) {
+						return '\\item '+content;
+					},
+		'ul':		function(content) {
+						return '\\begin{itemize}'+content+'\\end{itemize}';
+					},
+		'ol':		function(content) {
+						return '\\begin{enumerate}'+content+'\\end{enumerate}';
+					},
 	};
 
 	var unicode1 = {
@@ -508,7 +532,7 @@ function makeParagraph(val,notypeset)
 }
 function cleanJME(val)
 {
-	var dval = $.trim(val).replace(/\n/g,'');
+	var dval = $.trim(val);
 	dval = textile(dval);
 	var bits = Numbas.util.contentsplitbrackets(dval);
 	dval='';
