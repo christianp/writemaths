@@ -591,6 +591,8 @@ function finishParagraph(p) {
 }
 
 function input2display(e) {
+	e.attr('going',true);
+
 	var val = e.val();
 	var d = makeParagraph(val);
 	var p;
