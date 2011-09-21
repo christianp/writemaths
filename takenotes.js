@@ -157,7 +157,7 @@ $(window).ready(function() {
 			$.post('note.php',{name: btoa(this.saveName), content: btoa(s)},function(){
 				wm.posting = false;
 				if(wm.nextPost)
-					wm.savefn.apply(wm,wm.nextPost);
+					wm.savefn.apply(wm,[wm.nextPost]);
 			});
 		}
 	}
