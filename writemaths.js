@@ -45,6 +45,11 @@ WriteMaths.prototype = {
 		var wm = this;
 		var e = this.e;
 
+		//trigger a 'setstate' event to set the state of the writemaths area
+		e.bind('setstate',function(ev,state) {
+			wm.setState(state);
+		});
+
 		//clicking on a paragraph makes it editable
 		e.delegate('.line','click',function(e) {
 			if(wm.locked) { return }
@@ -273,6 +278,7 @@ WriteMaths.prototype = {
 	setState: function(s) {
 		this.e.html('');
 		this.e.append('<div class="preview"/>');
+		this.e.attr('value',s);
 
 		var lines = s.split('\n');
 		var i = lines.length;
@@ -296,7 +302,7 @@ WriteMaths.prototype = {
 	},
 
 	getState: function() {
-		var lines = this.e.children('.line, textarea, input').add('ol .line, ul .line').map(function(){
+		var lines = this.e.children('.line, textarea, input').add(this.e.children('ol,ul').children('.line,input')).map(function(){
 			return ($(this).attr('source') || $(this).val());
 		}).toArray();
 		var nlines = [];
@@ -326,6 +332,8 @@ WriteMaths.prototype = {
 
 
 	output: function() {
+		var state = this.getState();
+		this.e.attr('value',state.join('\n'));
 		var source;
 		switch(this.outputMode)
 		{
