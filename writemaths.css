@@ -7,11 +7,12 @@
 	text-align: center;
 }
 
-.writemaths p, .writemaths h1, .writemaths h2, .writemaths h3, .writemaths h4, .writemaths h5, .writemaths h6 {
+.writemaths .line {
 	background: #fefefe;
 	min-height: 1em;
 }
-.writemaths p:hover, .writemaths h1:hover, .writemaths h2:hover, .writemaths h3:hover, .writemaths h4:hover, .writemaths h5:hover, .writemaths h6:hover {
+
+.writemaths:not(.locked) .line:hover {
 	background: #fafafa;
 }
 
@@ -32,7 +33,7 @@ ol input, ul input {
 	margin-left: -1em;
 }
 
-.writemaths textarea, .writemaths input, .writemaths p, .writemaths h1, .writemaths h2, .writemaths h3, .writemaths h4, .writemaths h5, .writemaths h6 {
+.writemaths textarea, .writemaths input, .writemaths .line {
 	width: 100%;
 	margin: 0.1em 0;
 	padding: 0.1em 0.2em;

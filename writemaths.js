@@ -26,13 +26,28 @@ WriteMaths = function(e,options)
 WriteMaths.numGraphs = 0;
 
 WriteMaths.prototype = {
+	locked: false,
+
 	outputMode: 'html',
+
+	lock: function() {
+		this.locked = true;
+		this.e.find('textarea,input').blur();
+		this.e.addClass('locked');
+	},
+
+	unlock: function() {
+		this.locked = false;
+		this.e.removeClass('locked');
+	},
+
 	bindEvents: function() {
 		var wm = this;
 		var e = this.e;
 
 		//clicking on a paragraph makes it editable
 		e.delegate('.line','click',function(e) {
+			if(wm.locked) { return }
 			var d = input();
 			d.val(($(this).attr('source') || '').trim());
 			$(this).replaceWith(d);
@@ -43,6 +58,7 @@ WriteMaths.prototype = {
 
 		//handle keypresses in input
 		e.delegate('textarea, input','keydown',function(ev) {
+			if(wm.locked) { return }
 			//find previous and next lines, in case they need to be used
 			var prvLine;
 			var i = $(this);
@@ -218,9 +234,11 @@ WriteMaths.prototype = {
 		e.delegate('textarea, input','keyup',positionPreview).delegate('textarea, input','click',positionPreview);
 
 		e.delegate('textarea, input','keyup',function() {
+			if(wm.locked) { return }
 			wm.saveState();
 		});
 		e.delegate('textarea, input','input',function() {
+			if(wm.locked) { return }
 			wm.output();
 		});
 
@@ -230,7 +248,15 @@ WriteMaths.prototype = {
 			e.find('.preview').hide();
 		});
 
-		e.delegate('.graph','click',function(e){e.preventDefault();e.stopPropagation();if(!e){var e = window.event;};e.cancelBubble = true;return false;});
+		e.delegate('.graph','click',function(e){
+			e.preventDefault();
+			e.stopPropagation();
+			if(!e){
+				var e = window.event;
+			};
+			e.cancelBubble = true;
+			return false;
+		});
 	},
 
 	load: function() {
@@ -332,10 +358,6 @@ WriteMaths.prototype = {
 			if(h.find('br').length)
 			{
 				lines[i]='';
-			}
-			else if( (el.tagName.toLowerCase()=='p') && !el.attributes.length )
-			{
-				lines[i] = h.html();
 			}
 			else
 			{
@@ -592,7 +614,6 @@ function finishParagraph(p) {
 
 function input2display(e) {
 	e.attr('going',true);
-
 	var val = e.val();
 	var d = makeParagraph(val);
 	var p;
