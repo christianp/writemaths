@@ -279,6 +279,7 @@ WriteMaths.prototype = {
 		this.e.html('');
 		this.e.append('<div class="preview"/>');
 		this.e.attr('value',s);
+		this.e.trigger('input');
 
 		var lines = s.split('\n');
 		var i = lines.length;
