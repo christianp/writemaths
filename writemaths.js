@@ -600,6 +600,8 @@ function cleanJME(val)
 
 function finishParagraph(p) {
 	try{
+		p.find('a').attr('target','_blank');
+
 		p.find('.graph').each(function() {
 			var id = $(this).attr('id');
 			var src = $(this).attr('source');
