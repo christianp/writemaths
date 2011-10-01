@@ -47,7 +47,8 @@ WriteMaths.prototype = {
 
 		//trigger a 'setstate' event to set the state of the writemaths area
 		e.bind('setstate',function(ev,state) {
-			wm.setState(state);
+			if(state!=e.attr('value'))	
+				wm.setState(state);
 		});
 
 		//clicking on a paragraph makes it editable
