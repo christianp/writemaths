@@ -547,7 +547,7 @@ function makeParagraph(val,notypeset)
 		d = $('<p><br/></p>');
 	}
 	d.addClass('line');
-	return d;
+	return d.first();
 }
 function cleanJME(val)
 {
