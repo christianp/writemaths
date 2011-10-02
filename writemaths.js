@@ -601,6 +601,7 @@ function cleanJME(val)
 
 function finishParagraph(p) {
 	try{
+
 		p.find('.graph').each(function() {
 			var id = $(this).attr('id');
 			var src = $(this).attr('source');
@@ -620,6 +621,7 @@ function finishParagraph(p) {
 	}
 	catch(e) {}
 	p.linkURLs().find('a').oembed()
+	p.find('a').attr('target','_blank');
 }
 
 function input2display(e) {
