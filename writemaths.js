@@ -209,6 +209,7 @@ WriteMaths.prototype = {
 			}
 			if(i==val.length)
 			{
+				//try to make a guess at how much of the remaining string is meant to be maths
 				var words = val.slice(startMath).split(' ');
 				var j = 0;
 				while(j<words.length && !words[j].match(/^\w\w+$/))
@@ -219,6 +220,8 @@ WriteMaths.prototype = {
 				i = Math.max(this.selectionStart,i);
 			}
 			var math = val.slice(startMath,i+mathDelimit.length-1);
+			if(math.slice(-mathDelimit.length)!=mathDelimit)
+				math+=mathDelimit;
 
 			var dr = $('<p>'+txt.slice(0,startMath)+'</p>');
 			e.append(dr);
