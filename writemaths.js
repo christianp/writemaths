@@ -261,7 +261,6 @@ WriteMaths.prototype = {
 		});
 
 		e.delegate('.graph','click',function(e){
-			return;
 			e.preventDefault();
 			e.stopPropagation();
 			if(!e){
@@ -611,20 +610,34 @@ function finishParagraph(p) {
 			var id = $(this).attr('id');
 			var src = $(this).attr('source');
 			$(this).css('width','400px').css('height','300px');
-			JXG.JSXGraph
-				.initBoard(id,{
-					showCopyright:false,
-					originX: 200,
-					originY: 150,
-					unitX: 50,
-					unitY: 50,
-					axis:true
-				})
-				.construct(src)
-			;
+			urlexp.lastIndex = 0;
+			if(src.match(/^geonext /))
+			{
+				src = src.slice(8);
+				if(urlexp.test(src))
+					JXG.JSXGraph.loadBoardFromFile(id,src,'Geonext');
+				else
+					JXG.JSXGraph.loadBoardFromString(id,src,'Geonext');
+			}
+			else
+			{
+				JXG.JSXGraph
+					.initBoard(id,{
+						showCopyright:false,
+						originX: 200,
+						originY: 150,
+						unitX: 50,
+						unitY: 50,
+						axis:true
+					})
+					.construct(src)
+				;
+			}
 		});
 	}
-	catch(e) {}
+	catch(e) {
+		console.log(e);
+	}
 	p.linkURLs().find('a').oembed()
 	p.find('a').attr('target','_blank');
 }

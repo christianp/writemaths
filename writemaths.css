@@ -47,8 +47,8 @@
 	border: 1px solid;
 	margin: 0 auto;
 }
-.writemaths .graph > * {
-	position: fixed;
+.writemaths .graph {
+	text-indent: initial;
 }
 
 .writemaths .preview {
