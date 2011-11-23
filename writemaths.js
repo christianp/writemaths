@@ -261,6 +261,7 @@ WriteMaths.prototype = {
 		});
 
 		e.delegate('.graph','click',function(e){
+			return;
 			e.preventDefault();
 			e.stopPropagation();
 			if(!e){

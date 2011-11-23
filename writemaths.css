@@ -47,6 +47,9 @@
 	border: 1px solid;
 	margin: 0 auto;
 }
+.writemaths .graph > * {
+	position: fixed;
+}
 
 .writemaths .preview {
 	z-index: 1;
