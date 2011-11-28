@@ -209,7 +209,7 @@ WriteMaths.prototype = {
 					inMath = false;
 				i+=1;
 			}
-			if(i==val.length)
+			if(inMath && i==val.length)
 			{
 				//try to make a guess at how much of the remaining string is meant to be maths
 				var words = val.slice(startMath).split(' ');
