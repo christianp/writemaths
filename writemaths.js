@@ -5,9 +5,7 @@ WriteMaths = function(e,options)
 	if(!options)
 		options = {};
 	e=$(e);
-	e.addClass('writemaths')
-     .attr('tabindex','0')
-    ;
+	e.addClass('writemaths');
 	this.e = e;
 	this.d = options.display;
 	this.saveName = options.saveName;
@@ -47,9 +45,9 @@ WriteMaths.prototype = {
 		var wm = this;
 		var e = this.e;
 
-        //when widget receives focus, select first line
-        e.focus(function() {
-            $(this).find('.line:first').click();
+        //when a line receives focus, turn it into an input
+        e.delegate('.line','focus',function() {
+            $(this).click();
         });
 
 		//trigger a 'setstate' event to set the state of the writemaths area
@@ -558,7 +556,7 @@ function makeParagraph(val,notypeset)
 	{
 		d = $('<p><br/></p>');
 	}
-	d.addClass('line');
+	d.addClass('line').attr('tabindex',0);
 	return d.first();
 }
 function cleanJME(val)
