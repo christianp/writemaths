@@ -13,7 +13,6 @@ Writemaths requires the following libraries:
 * jQuery - http://jQuery.com
 * jquery-ui - http://jQueryui.com (just the position function)
 * jquery.oembed - http://code.google.com/p/jquery-oembed
-* jsxGraph - http://jsxgraph.uni-bayreuth.de
 * jstextile - http://github.com/christianp/jstextile
 
 [Click here to use write maths, see maths](http://takenot.es).
