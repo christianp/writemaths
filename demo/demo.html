@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Write maths, see maths demo</title>
+
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.14/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="textile.js"></script>
+		<script type="text/javascript" src="jquery.oembed.js"></script>
+		<script type="text/javascript" src="numbas/numbas.js"></script>
+
+		<!-- MathJax -->
+		<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js">
+		  MathJax.Hub.Config({
+			extensions: ['tex2jax.js',"TeX/AMSmath.js","TeX/AMSsymbols.js"],
+			tex2jax: {inlineMath: [["$","$"],["\\(","\\)"]]},
+			jax: ["input/TeX","output/HTML-CSS"],
+			displayAlign: "center",
+			displayIndent: "0.1em",
+			showProcessingMessages: false
+		  });
+	  	</script>
+
+		<script type="text/javascript" src="../writemaths.js"></script>
+
+		<link rel="stylesheet" href="../writemaths.css"></link>
+
+		<script language="javascript">
+			$(document).ready(function() {
+				Numbas.loadScript('scripts/jme-display.js');
+				Numbas.loadScript('scripts/jme.js');
+				Numbas.startOK = true;
+				Numbas.init = function() {
+					$('#wm').writemaths();
+				};
+				Numbas.tryInit();
+			});
+		</script>
+		<style type="text/css">
+			#wm {
+				border: 1px solid gray;
+				margin: 0 1em;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Write maths, see maths demo</h1>
+
+		<div id="wm"></div>
+	</body>
+</html>

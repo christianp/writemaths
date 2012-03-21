@@ -1,5 +1,14 @@
 var WriteMaths;
 (function() {
+var MathJaxQueue;
+$(document).ready(function() {
+	MathJaxQueue = MathJax.Callback.Queue(MathJax.Hub.Register.StartupHook('End',{}));
+	$.fn.mathjax = function() {
+		$(this).each(function() {
+			MathJaxQueue.Push(['Typeset',MathJax.Hub,this]);
+		});
+	}
+})
 WriteMaths = function(e,options)
 {
 	if(!options)
@@ -23,7 +32,11 @@ WriteMaths = function(e,options)
 
 	this.load();
 }
-WriteMaths.numGraphs = 0;
+$.fn.writemaths = function(options) {
+	$(this).each(function() {
+		new WriteMaths(this,options);
+	});
+}
 
 WriteMaths.prototype = {
 	locked: false,
@@ -45,9 +58,9 @@ WriteMaths.prototype = {
 		var wm = this;
 		var e = this.e;
 
-        //when a line receives focus, turn it into an input
+        //when a line receives focus, select it
         e.delegate('.line','focus',function() {
-            $(this).click();
+			$(this).click();
         });
 
 		//trigger a 'setstate' event to set the state of the writemaths area
@@ -64,6 +77,8 @@ WriteMaths.prototype = {
 			$(this).replaceWith(d);
 			d.focus();
 			positionPreview.apply(d[0]);
+			e.stopPropagation();
+			e.preventDefault();
 		});
 		
 
@@ -291,12 +306,12 @@ WriteMaths.prototype = {
 		this.e.html('');
 		this.e.append('<div class="preview"/>');
 		this.e.attr('value',s);
-		this.e.trigger('input');
 
 		var lines = s.split('\n');
 		var i = lines.length;
 		while(i--)
 		{
+			lines[i] = lines[i].trim();
 			var p = makeParagraph(lines[i]);
 			if(p.is('ol,ul'))
 			{
@@ -516,21 +531,107 @@ var htmlToTeX;
 	}
 })();
 
-function texMaths(s) {
-	var bits = Numbas.jme.splitbrackets(s,'{','}');
-	var out = '';
-	for(var i=0;i<bits.length;i++)
+function texsplit(s)
+{
+	var cmdre = /((?:.|\n)*?)\\((?:var)|(?:simplify))/m;
+	var out = [];
+	while( m = s.match(cmdre) )
 	{
-		if(i%2)	//JME
-			out += bits[i];
-		else	//raw LaTeX
-			try{
-				out += Numbas.jme.display.exprToLaTeX(bits[i]);
-			}catch(e){
-				out+=bits[i];
+		out.push(m[1]);
+		var cmd = m[2];
+		out.push(cmd);
+
+		var i = m[0].length;
+
+		var args = '';
+		var argbrackets = false;
+		if( s.charAt(i) == '[' )
+		{
+			argbrackets = true;
+			var si = i+1;
+			while(i<s.length && s.charAt(i)!=']')
+				i++;
+			if(i==s.length)
+			{
+				out = out.slice(0,-2);
+				out.push(s);
+				return out;
 			}
+			else
+			{
+				args = s.slice(si,i);
+				i++;
+			}
+		}
+		if(!argbrackets)
+			args='all';
+		out.push(args);
+
+		if(s.charAt(i)!='{')
+		{
+			out = out.slice(0,-3);
+			out.push(s);
+			return out;
+		}
+
+		var brackets=1;
+		var si = i+1;
+		while(i<s.length-1 && brackets>0)
+		{
+			i++;
+			if(s.charAt(i)=='{')
+				brackets++;
+			else if(s.charAt(i)=='}')
+				brackets--;
+		}
+		if(i == s.length-1 && brackets>0)
+		{
+			out = out.slice(0,-3);
+			out.push(s);
+			return out;
+		}
+
+		var expr = s.slice(si,i);
+		s = s.slice(i+1);
+		out.push(expr);
 	}
+	out.push(s);
 	return out;
+}
+
+function texMaths(s) {
+
+	var bits = texsplit(s);
+	var out = '';
+	for(var i=0;i<bits.length-3;i+=4)
+	{
+		out+=bits[i];
+		var cmd = bits[i+1],
+			args = bits[i+2],
+			expr = bits[i+3];
+		try{
+			var sbits = Numbas.util.splitbrackets(expr,'{','}');
+			var expr = '';
+			for(var j=0;j<sbits.length;j+=1)
+			{
+				expr += j%2 ? 'subvar('+sbits[j]+',"red")' : sbits[j];
+			}
+			expr = Numbas.jme.display.exprToLaTeX(expr);
+		} catch(e) {
+			expr = '\\color{red}{'+expr+'}';
+		}
+
+		switch(cmd)
+		{
+		case 'var':	//substitute a variable
+			out += ' \\color{olive}{\\boxed{'+expr+'}} ';
+			break;
+		case 'simplify': //a JME expression to be simplified
+			out += ' \\color{#ff1493}{\\boxed{'+expr+'}} ';
+			break;
+		}
+	}
+	return out+bits[bits.length-1];
 };
 
 function input() {
@@ -540,7 +641,7 @@ function makeParagraph(val,notypeset)
 {
 	if(val.length)
 	{
-		var dval = cleanJME(val);
+		var dval = cleanJME(val).trim();
 		var d = $(textile(dval));
 		if(d.is('div'))
 		{
@@ -550,7 +651,7 @@ function makeParagraph(val,notypeset)
 		}
 		d.attr('source',val);
 		if(!notypeset)
-			MathJax.Hub.Queue(['Typeset',MathJax.Hub,d[0]]);
+			d.mathjax();
 	}
 	else
 	{
@@ -592,16 +693,6 @@ function cleanJME(val)
 				else
 					dval += bits[i];
 				break;
-			case '%%':
-				if(i<bits.length-1)
-				{
-					WriteMaths.numGraphs += 1;
-					dval += '<div id="jsxgraph-'+WriteMaths.numGraphs+'" class="graph" source="'+bits[i+1]+'"/>';
-					i+=2;
-				}
-				else
-					dval += bits[i];
-				break;
 			}
 		}
 	}
@@ -609,40 +700,6 @@ function cleanJME(val)
 }
 
 function finishParagraph(p) {
-	try{
-
-		p.find('.graph').each(function() {
-			var id = $(this).attr('id');
-			var src = $(this).attr('source');
-			$(this).css('width','400px').css('height','300px');
-			urlexp.lastIndex = 0;
-			if(src.match(/^geonext /))
-			{
-				src = src.slice(8);
-				if(urlexp.test(src))
-					JXG.JSXGraph.loadBoardFromFile(id,src,'Geonext');
-				else
-					JXG.JSXGraph.loadBoardFromString(id,src,'Geonext');
-			}
-			else
-			{
-				JXG.JSXGraph
-					.initBoard(id,{
-						showCopyright:false,
-						originX: 200,
-						originY: 150,
-						unitX: 50,
-						unitY: 50,
-						axis:true
-					})
-					.construct(src)
-				;
-			}
-		});
-	}
-	catch(e) {
-		console.log(e);
-	}
 	p.linkURLs().find('a').oembed()
 	p.find('a').attr('target','_blank');
 }
@@ -1176,7 +1233,7 @@ function style_html(html_source, indent_size, indent_character, max_char, brace_
    width: 'auto'
   });
 
-  $(div).html($(el).html());
+  $(div).html($(el).html() || $(el).val());
   var styles = ['font-size','font-style', 'font-weight', 'font-family','line-height', 'text-transform', 'letter-spacing'];
   $(styles).each(function() {
    var s = this.toString();
@@ -1230,20 +1287,5 @@ textile.phraseTypes.splice(0,0,function(text) {
 	return out;
 });
 
-var re_jsxgraph = /%%.*?%%/g;
-textile.phraseTypes.splice(0,0,function(text) {
-	var out = [];
-	var m;
-	while(m=re_jsxgraph.exec(text))
-	{
-		var bit = [text.slice(0,m.index),m[0]];
-		out = this.joinPhraseBits(out,bit,out.length);
-		text = text.slice(re_jsxgraph.lastIndex);
-		re_jsxgraph.lastIndex = 0;
-	}
-	if(out.length)
-		out = this.joinPhraseBits(out,[text],out.length);
-	return out;
-});
 
 })();
