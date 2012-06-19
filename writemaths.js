@@ -96,10 +96,7 @@ $(function() {
             }
             el.addClass('writemaths tex2jax_ignore');
             var previewElement = $('<div class="wm_preview"/>');
-			if(textarea)
-                $('body').append(previewElement);
-            else
-                $(this).append(previewElement);
+			$('body').append(previewElement);
 
             var queue = MathJax.Callback.Queue(MathJax.Hub.Register.StartupHook("End",{}));
             el
