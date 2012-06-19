@@ -5,9 +5,10 @@
 
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.14/jquery-ui.min.js"></script>
-		<script type="text/javascript" src="textile.js"></script>
-		<script type="text/javascript" src="jquery.oembed.js"></script>
-		<script type="text/javascript" src="numbas/numbas.js"></script>
+		<script type="text/javascript" src="rangy-core.js"></script>
+		<script type="text/javascript" src="rangy-position.js"></script>
+		<script type="text/javascript" src="textinputs_jquery.js"></script>
+		<script type="text/javascript" src="jquery.caretposition.js"></script>
 
 		<!-- MathJax -->
 		<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js">
@@ -23,29 +24,63 @@
 
 		<script type="text/javascript" src="../writemaths.js"></script>
 
-		<link rel="stylesheet" href="../writemaths.css"></link>
-
 		<script language="javascript">
-			$(document).ready(function() {
-				Numbas.loadScript('scripts/jme-display.js');
-				Numbas.loadScript('scripts/jme.js');
-				Numbas.startOK = true;
-				Numbas.init = function() {
-					$('#wm').writemaths();
-				};
-				Numbas.tryInit();
+            $(document).ready(function() {
+                $('.wm').writemaths();
 			});
 		</script>
-		<style type="text/css">
-			#wm {
+        <style type="text/css">
+            body {
+                font-family: 'trebuchet ms', Verdana;
+            }
+            textarea {
+                font-size: 1.3em;
+            }
+            input {
+                font-size: 1em;
+            }
+			.wm {
 				border: 1px solid gray;
-				margin: 0 1em;
-			}
+                margin: 0 1em;
+            }
+            div.wm {
+                min-height: 5em;
+                padding: 0 1em;
+            }
+            input.wm {
+                height: 1.5em;
+            }
 		</style>
 	</head>
 	<body>
 		<h1>Write maths, see maths demo</h1>
 
-		<div id="wm"></div>
+        <div class="wm" contenteditable>
+            <p><code class="tex2jax_ignore">$(selector).writemaths()</code> adds a bit of MathJax magic to editable areas so that when you're writing LaTeX, you get an instant preview just above the cursor.</p>
+            <p>For example, click inside these LaTeX expressions:</p>
+            <ul>
+                <li>$e^{\pi i} + 1 = 0$</p>
+                <li>\[e^{\pi i} + 1 = 0\]</p>
+                <li>Of course, it works when maths is in the middle of a line, like $\log_2 \left( \frac{1}{x+2} \right)$ is.</li>
+            </ul>
+            <p>But stuff inside a <code>&lt;code&gt;</code> tag doesn't count: <code>$e^{\pi i}+1 = 0$</code>.</p>
+        </div>
+
+        <p>
+            It works in <code>&lt;textarea&gt;</code> tags too:
+            <br/>
+            <textarea class="wm" rows="5" cols="50">a $x+1$</textarea>
+        </p>
+        <p>
+            And <code>&lt;input&gt;</code> tags, of course:
+            <br/>
+            <input type="text" class="wm" value="$x^2$"/>
+        </p>
+
+        <p>This plugin needs <a href="http://code.google.com/p/rangy/">rangy-core.js</a> and <a href="http://code.google.com/p/rangy/source/browse/trunk/src/js/modules/rangy-position.js">rangy-position.js</a> for <code>contenteditable</code> areas. For <code>textarea</code> and <code>input</code> tags, it needs <a href="https://github.com/beviz/jquery-caret-position-getter">jquery.caretposition.js</a> and <a href="http://code.google.com/p/rangyinputs/downloads/list">textinputs_jquery.js</a>.</p>
+
+        <p>Made by <a href="http://github.com/christianp">cp</a> in 2012.</p>
+
+        <a href="https://github.com/christianp/writemaths"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png" alt="Fork me on GitHub"></a>
 	</body>
 </html>

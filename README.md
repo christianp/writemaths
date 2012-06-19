@@ -1,18 +1,12 @@
-Write maths, see maths is a sort-of-WYSIWYG editor for HTML+LaTeX maths.
+Write maths, see maths is a jQuery plugin for editable areas which gives an instant [MathJax](http://www.mathjax.org) preview of the TeX you're writing just above the cursor.
 
-It's implemented using [jQuery](http://jquery.com) and [MathJax](http://www.mathjax.org)
+To use it, just call <code>$(selector).writemaths()$</code> when the page loads.
 
-You can write maths in a simple BASIC-style syntax, or in raw LaTeX.
+You can optionally pass in an object with some options:
 
-Text can be formatted using [Textile](http://textile.thresholdstate.com)
+* ```cleanMaths```: a function which does something to the LaTeX before displaying it.
+* ```callback```: a function which is called when the preview is displayed.
+* ```iFrame```: set this to `true` if you're applying writemaths to something like TinyMCE, which lives inside an iframe.
 
-The editor exports nice clean HTML for easy pasting into things like blog posts.
-
-Writemaths requires the following libraries:
-
-* jQuery - http://jQuery.com
-* jquery-ui - http://jQueryui.com (just the position function)
-* jquery.oembed - http://code.google.com/p/jquery-oembed
-* jstextile - http://github.com/christianp/jstextile
-
-[Click here to use write maths, see maths](http://takenot.es).
+The old version of write maths, see maths was an attempt at a line-by-line WYSIWYG editor with instant maths preview and a load of other stuff.
+It lives on at [takenot.es](http://takenot.es).
