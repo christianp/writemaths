@@ -1,8 +1,12 @@
+---
+---
+
 <!doctype html>
 <html>
 	<head>
-		<title>Write maths, see maths demo</title>
+		<title>Write maths, see maths</title>
 
+		<!-- libraries -->
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.14/jquery-ui.min.js"></script>
 		<script type="text/javascript" src="rangy-core.js"></script>
@@ -11,24 +15,25 @@
 		<script type="text/javascript" src="jquery.caretposition.js"></script>
 
 		<!-- MathJax -->
-		<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js">
+		<script type="text/x-mathjax-config">
 		  MathJax.Hub.Config({
-			extensions: ['tex2jax.js',"TeX/AMSmath.js","TeX/AMSsymbols.js"],
-			tex2jax: {inlineMath: [["$","$"],["\\(","\\)"]]},
-			jax: ["input/TeX","output/HTML-CSS"],
+			tex2jax: {inlineMath: [["$","$"]]},
 			displayAlign: "center",
-			displayIndent: "0.1em",
-			showProcessingMessages: false
+			displayIndent: "0.1em"
 		  });
-	  	</script>
+		</script>
+		<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML.js"></script>
 
+		<!-- writemaths itself -->
 		<script type="text/javascript" src="writemaths.js"></script>
 
+		<!-- initialise writemaths on all elements with class 'wm' -->
 		<script language="javascript">
             $(document).ready(function() {
                 $('.wm').writemaths();
 			});
 		</script>
+
         <style type="text/css">
             body {
                 font-family: 'trebuchet ms', Verdana;
@@ -49,11 +54,15 @@
             }
             input.wm {
                 height: 1.5em;
-            }
+			}
+			pre {
+				background-color: #eee;
+				display:inline-block;
+			}
 		</style>
 	</head>
 	<body>
-		<h1>Write maths, see maths demo</h1>
+		<h1>Write maths, see maths</h1>
 
         <div class="wm" contenteditable>
             <p><code class="tex2jax_ignore">$(selector).writemaths()</code> adds a bit of MathJax magic to editable areas so that when you're writing LaTeX, you get an instant preview just above the cursor.</p>
@@ -77,7 +86,40 @@
             <input type="text" class="wm" value="$x^2$"/>
         </p>
 
-        <p>This plugin needs <a href="http://code.google.com/p/rangy/">rangy-core.js</a> and <a href="http://code.google.com/p/rangy/source/browse/trunk/src/js/modules/rangy-position.js">rangy-position.js</a> for <code>contenteditable</code> areas. For <code>textarea</code> and <code>input</code> tags, it needs <a href="https://github.com/beviz/jquery-caret-position-getter">jquery.caretposition.js</a> and <a href="http://code.google.com/p/rangyinputs/downloads/list">textinputs_jquery.js</a>.</p>
+		<h3>Download: <a href="https://raw.github.com/christianp/writemaths/master/writemaths.js">writemaths.js</a>.</h3>
+
+		<h3>Installation</h3>
+		<p>This plugin needs <a href="http://jquery.com">jQuery</a> and the <code>position</code> plugin from <a href="http://jqueryui.com/demos/position/">jQuery UI</a>, as well as <a href="http://code.google.com/p/rangy/">rangy-core.js</a> and <a href="http://code.google.com/p/rangy/source/browse/trunk/src/js/modules/rangy-position.js">rangy-position.js</a> for <code>contenteditable</code> areas. For <code>textarea</code> and <code>input</code> tags, it needs <a href="https://github.com/beviz/jquery-caret-position-getter">jquery.caretposition.js</a> and <a href="http://code.google.com/p/rangyinputs/downloads/list">textinputs_jquery.js</a>.</p>
+		<p>Put this in your page's <code>&lt;head&gt;</code> tag:</p>
+{% highlight html %}
+<!-- libraries -->
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.14/jquery-ui.min.js"></script>
+<script type="text/javascript" src="rangy-core.js"></script>
+<script type="text/javascript" src="rangy-position.js"></script>
+<script type="text/javascript" src="textinputs_jquery.js"></script>
+<script type="text/javascript" src="jquery.caretposition.js"></script>
+
+<!-- MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+   tex2jax: {inlineMath: [["$","$"]]},
+   displayAlign: "center",
+   displayIndent: "0.1em"
+  });
+</script>
+<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML.js"></script>
+
+<!-- writemaths itself -->
+<script type="text/javascript" src="writemaths.js"></script>
+
+<!-- initialise writemaths on all elements with class 'wm' -->
+<script language="javascript">
+   $(document).ready(function() {
+      $('.wm').writemaths();
+   });
+</script>
+{% endhighlight %}
 
         <p>Made by <a href="http://github.com/christianp">cp</a> in 2012.</p>
 

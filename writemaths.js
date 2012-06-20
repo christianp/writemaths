@@ -95,7 +95,7 @@ jQuery(function() {
                 el = jQuery(this);
             }
             el.addClass('writemaths tex2jax_ignore');
-            var previewElement = jQuery('<div class="wm_preview"/>');
+            var previewElement = $('<div class="wm_preview"/>');
 			jQuery('body').append(previewElement);
 
             var queue = MathJax.Callback.Queue(MathJax.Hub.Register.StartupHook("End",{}));
