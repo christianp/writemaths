@@ -71,35 +71,32 @@ function restoreSelection(containerEl, savedSel) {
 }
 
 
-$(function() {
-    $("<style type='text/css'> .wm_preview { z-index: 1; position: absolute; display: none; border: 1px solid; padding: 0.2em; width: auto; margin: 0 auto; background: white;} </style>").appendTo("head");
+jQuery(function() {
+    jQuery("<style type='text/css'> .wm_preview { z-index: 1; position: absolute; display: none; border: 1px solid; padding: 0.2em; width: auto; margin: 0 auto; background: white;} </style>").appendTo("head");
 
-	$.fn.writemaths = function(options) {
-		options = $.extend({
+	jQuery.fn.writemaths = function(options) {
+		options = jQuery.extend({
 			cleanMaths: function(m){ return m; },
 			callback: function() {},
             iFrame: false,
 		},options);
 
-        $(this).each(function() {
+        jQuery(this).each(function() {
 
-            var textarea = $(this).is('textarea,input');
+            var textarea = jQuery(this).is('textarea,input');
 
             var root = this;
             if(options.iFrame) {
-    			var iframe = $(this).find('iframe')[0];
-                var el = $(iframe).contents().find('body');
+    			var iframe = jQuery(this).find('iframe')[0];
+                var el = jQuery(iframe).contents().find('body');
             }
             else
             {
-                el = $(this);
+                el = jQuery(this);
             }
             el.addClass('writemaths tex2jax_ignore');
-            var previewElement = $('<div class="wm_preview"/>');
-			if(textarea)
-                $('body').append(previewElement);
-            else
-                $(this).append(previewElement);
+            var previewElement = jQuery('<div class="wm_preview"/>');
+			jQuery('body').append(previewElement);
 
             var queue = MathJax.Callback.Queue(MathJax.Hub.Register.StartupHook("End",{}));
             el
@@ -111,12 +108,12 @@ $(function() {
 
                 var pos, txt, sel, range;
                 if(textarea) {
-                    pos = $(this).getCaretPosition();
-                    var fontHeight = parseInt($(this).css('font-size').replace('px',''));
+                    pos = jQuery(this).getCaretPosition();
+                    var fontHeight = parseInt(jQuery(this).css('font-size').replace('px',''));
                     pos = {x: pos.left, y: pos.top - fontHeight};
-                    sel = $(this).getSelection();
+                    sel = jQuery(this).getSelection();
                     range = {startOffset: sel.start, endOffset: sel.end};
-                    txt = $(this).val();
+                    txt = jQuery(this).val();
                 }
                 else {
                     sel = options.iFrame ? rangy.getIframeSelection(iframe) : rangy.getSelection();
@@ -127,9 +124,9 @@ $(function() {
                         return;
                     }
                     var anchor = sel.anchorNode;
-                    if($(anchor).parents('code,pre,.wm_ignore').length)
+                    if(jQuery(anchor).parents('code,pre,.wm_ignore').length)
                         return;
-                    txt = $(anchor).text();
+                    txt = jQuery(anchor).text();
                     range = sel.getRangeAt(0);
                 }
 
@@ -172,7 +169,7 @@ $(function() {
                     i+=1;
                 }
                 if(txt!=otxt) {
-                    anchor = $(anchor).replaceWith(txt);
+                    anchor = jQuery(anchor).replaceWith(txt);
                 }
 
                 if(!inMath)
