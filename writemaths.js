@@ -1,3 +1,13 @@
+/*
+Copyright (C) 2012 Christian Perfect
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
 function saveSelection(containerEl) {
     var charIndex = 0, start = 0, end = 0, foundStart = false, stop = {};
     var sel = rangy.getSelection(), range;
@@ -95,15 +105,12 @@ jQuery(function() {
                 el = jQuery(this);
             }
             el.addClass('writemaths tex2jax_ignore');
-            var previewElement = $('<div class="wm_preview"/>');
+            var previewElement = jQuery('<div class="wm_preview"/>');
 			jQuery('body').append(previewElement);
 
             var queue = MathJax.Callback.Queue(MathJax.Hub.Register.StartupHook("End",{}));
-            el
-			.on('blur',function(e) {
-				previewElement.hide();
-			})
-			.on('keyup click',function(e) {
+
+			function updatePreview(e) {
                 previewElement.hide();
 
                 var pos, txt, sel, range;
@@ -123,12 +130,29 @@ jQuery(function() {
                     catch(e) {
                         return;
                     }
+					if(options.iFrame) {
+						pos.y -= $(iframe).contents().scrollTop();
+						previewElement.html(pos.y+','+$(iframe).contents().scrollTop()+','+$(iframe).position().y);
+					}
                     var anchor = sel.anchorNode;
+
+                    range = sel.getRangeAt(0);
+
+					if(anchor.nodeType == anchor.TEXT_NODE) {	
+						while(anchor.previousSibling) {
+							anchor = anchor.previousSibling;
+							range.startOffset += anchor.textContent.length;
+							range.endOffset += anchor.textContent.length;
+						}
+						anchor = anchor.parentNode;
+					}
+
                     if(jQuery(anchor).parents('code,pre,.wm_ignore').length)
                         return;
                     txt = jQuery(anchor).text();
-                    range = sel.getRangeAt(0);
                 }
+				if(pos.y<0)
+					return;
 
                 //only do this if the selection has zero width
                 //so when you're selecting blocks of text, distracting previews don't pop up
@@ -221,7 +245,17 @@ jQuery(function() {
                 queue.Push(['Typeset',MathJax.Hub,previewElement[0]]);
                 queue.Push(positionPreview);
                 queue.Push(options.callback);
-            });
+            }
+
+            el
+			.on('blur',function(e) {
+				previewElement.hide();
+			})
+			.on('keyup click',updatePreview);
+			if(options.iFrame)
+				$(el[0].ownerDocument).on('scroll',updatePreview);
+			else
+				el.on('scroll',updatePreview);
 
         });
 		return this;
