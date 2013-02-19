@@ -147,7 +147,7 @@ jQuery(function() {
 						anchor = anchor.parentNode;
 					}
 
-                    if(jQuery(anchor).parents('code,pre,.wm_ignore').length)
+                    if(jQuery(anchor).add(jQuery(anchor).parents()).filter('code,pre,.wm_ignore').length)
                         return;
                     txt = jQuery(anchor).text();
                 }
