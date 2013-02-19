@@ -26,7 +26,8 @@
 
 		<script language="javascript">
             $(document).ready(function() {
-                $('.wm').writemaths();
+                $('.wm.ontop').writemaths();
+				$('.wm.side').writemaths({position:'center top', previewPosition: 'center bottom'});
 			});
 		</script>
         <style type="text/css">
@@ -55,7 +56,7 @@
 	<body>
 		<h1>Write maths, see maths demo</h1>
 
-        <div class="wm" contenteditable>
+        <div class="wm ontop" contenteditable>
             <p><code class="tex2jax_ignore">$(selector).writemaths()</code> adds a bit of MathJax magic to editable areas so that when you're writing LaTeX, you get an instant preview just above the cursor.</p>
             <p>For example, click inside these LaTeX expressions:</p>
             <ul>
@@ -69,7 +70,13 @@
         <p>
             It works in <code>&lt;textarea&gt;</code> tags too:
             <br/>
-            <textarea class="wm" rows="5" cols="50">a $x+1$</textarea>
+			<textarea class="wm side" rows="5" cols="50">a $x+1$
+\[ \begin{align}
+	x &= 1 \\
+	y &= 2 \\
+	z &= 3
+\end{align} \]
+</textarea>
         </p>
         <p>
             And <code>&lt;input&gt;</code> tags, of course:
