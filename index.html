@@ -6,9 +6,9 @@
 	<head>
 		<title>Write maths, see maths</title>
 
-		<!-- libraries -->
-		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.14/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+		<script type="text/javascript" src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+		<script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
 		<script type="text/javascript" src="rangy-core.js"></script>
 		<script type="text/javascript" src="rangy-position.js"></script>
 		<script type="text/javascript" src="textinputs_jquery.js"></script>
@@ -30,7 +30,8 @@
 		<!-- initialise writemaths on all elements with class 'wm' -->
 		<script language="javascript">
             $(document).ready(function() {
-                $('.wm').writemaths();
+                $('.wm.ontop').writemaths();
+				$('.wm.side').writemaths({position:'center top', previewPosition: 'center bottom'});
 			});
 		</script>
 
@@ -64,7 +65,7 @@
 	<body>
 		<h1>Write maths, see maths</h1>
 
-        <div class="wm" contenteditable>
+        <div class="wm ontop" contenteditable>
             <p><code class="tex2jax_ignore">$(selector).writemaths()</code> adds a bit of MathJax magic to editable areas so that when you're writing LaTeX, you get an instant preview just above the cursor.</p>
             <p>For example, click inside these LaTeX expressions:</p>
             <ul>
@@ -78,7 +79,13 @@
         <p>
             It works in <code>&lt;textarea&gt;</code> tags too:
             <br/>
-            <textarea class="wm" rows="5" cols="50">a $x+1$</textarea>
+			<textarea class="wm side" rows="5" cols="50">a $x+1$
+\[ \begin{align}
+	x &= 1 \\
+	y &= 2 \\
+	z &= 3
+\end{align} \]
+</textarea>
         </p>
         <p>
             And <code>&lt;input&gt;</code> tags, of course:
