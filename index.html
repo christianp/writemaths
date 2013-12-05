@@ -1,38 +1,36 @@
 <!doctype html>
 <html>
 	<head>
-		<title>Write maths, see maths</title>
+		<title>Write maths, see maths demo</title>
 
 		<script type="text/javascript" src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-		<script type="text/javascript" src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 		<script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
 		<script type="text/javascript" src="rangy-core.js"></script>
-		<script type="text/javascript" src="rangy-position.js"></script>
 		<script type="text/javascript" src="textinputs_jquery.js"></script>
-		<script type="text/javascript" src="jquery.caretposition.js"></script>
 
 		<!-- MathJax -->
-		<script type="text/x-mathjax-config">
+		<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js">
 		  MathJax.Hub.Config({
-			tex2jax: {inlineMath: [["$","$"]]},
+			extensions: ['tex2jax.js',"TeX/AMSmath.js","TeX/AMSsymbols.js"],
+			tex2jax: {inlineMath: [["$","$"],["\\(","\\)"]]},
+			jax: ["input/TeX","output/HTML-CSS"],
 			displayAlign: "center",
-			displayIndent: "0.1em"
+			displayIndent: "0.1em",
+			showProcessingMessages: false
 		  });
-		</script>
-		<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML.js"></script>
+	  	</script>
 
-		<!-- writemaths itself -->
 		<script type="text/javascript" src="writemaths.js"></script>
 
-		<!-- initialise writemaths on all elements with class 'wm' -->
 		<script language="javascript">
             $(document).ready(function() {
+				$('.wm.ontop').writemaths({position:'center top', previewPosition: 'center bottom', of: 'this'});
+				$('.wm.side').writemaths({position:'right middle', previewPosition: 'left middle'});
 			});
 		</script>
-
         <style type="text/css">
             body {
-                font-family: 'trebuchet ms', Verdana;
+                font-family: 'trebuchet ms', Verdana, sans-serif;
             }
             textarea {
                 font-size: 1.3em;
@@ -50,23 +48,32 @@
             }
             input.wm {
                 height: 1.5em;
-			}
+            }
 			pre {
-				background-color: #eee;
-				display:inline-block;
+			    margin-left: 2em;
+			    background-color: #eee;
+			    display: inline-block;
+			    padding: 0 1em;
+			}
+			.download-link {
+				font-size: 1.2em;
 			}
 		</style>
 	</head>
 	<body>
-		<h1>Write maths, see maths</h1>
+		<h1>Write maths, see maths demo</h1>
 
         <div class="wm ontop" contenteditable>
-            <p><code class="tex2jax_ignore">$(selector).writemaths()</code> adds a bit of MathJax magic to editable areas so that when you're writing LaTeX, you get an instant preview just above the cursor.</p>
+			<p><code class="tex2jax_ignore">$(selector).writemaths()</code> <span>adds a bit of MathJax magic to editable areas so that when you're writing LaTeX, you get an instant preview just above the cursor.</span></p>
             <p>For example, click inside these LaTeX expressions:</p>
             <ul>
-                <li>$e^{\pi i} + 1 = 0$</p>
-                <li>\[e^{\pi i} + 1 = 0\]</p>
-                <li>Of course, it works when maths is in the middle of a line, like $\log_2 \left( \frac{1}{x+2} \right)$ is.</li>
+				<li><p>$e^{\pi i} + 1 = 0$</p></li>
+				<li><p>\[e^{\pi i} + 1 = 0\]</p></li>
+				<li><p>\begin{align}<br/>
+				x &= 1 \\<br/>
+				y &= 2 \\<br/>
+				\end{align}</p></li>
+				<li><p>Of course, it works when maths is in the middle of a line, like $\log_2 \left( \frac{1}{x+2} \right)$ is.</p></li>
             </ul>
             <p>But stuff inside a <code>&lt;code&gt;</code> tag doesn't count: <code>$e^{\pi i}+1 = 0$</code>.</p>
         </div>
@@ -74,56 +81,57 @@
         <p>
             It works in <code>&lt;textarea&gt;</code> tags too:
             <br/>
-			<textarea class="wm side" rows="5" cols="50">a $x+1$
-\[ \begin{align}
+			<textarea class="wm ontop" rows="5" cols="50">a $x+1$
+\begin{align}
 	x &= 1 \\
 	y &= 2 \\
 	z &= 3
-\end{align} \]
+\end{align}
 </textarea>
         </p>
         <p>
             And <code>&lt;input&gt;</code> tags, of course:
             <br/>
-            <input type="text" class="wm" value="$x^2$"/>
+            <input type="text" class="wm side" value="$x^2$"/>
         </p>
 
-		<h3>Download: <a href="https://raw.github.com/christianp/writemaths/master/writemaths.js">writemaths.js</a>.</h3>
+		<h2>Download</h2>
+		<p class="download-link"><a href="https://raw.github.com/christianp/writemaths/master/writemaths.js">writemaths.js</a>.</p>
 
-		<h3>Installation</h3>
-		<p>This plugin needs <a href="http://jquery.com">jQuery</a> and the <code>position</code> plugin from <a href="http://jqueryui.com/demos/position/">jQuery UI</a>, as well as <a href="http://code.google.com/p/rangy/">rangy-core.js</a> and <a href="http://code.google.com/p/rangy/source/browse/trunk/src/js/modules/rangy-position.js">rangy-position.js</a> for <code>contenteditable</code> areas. For <code>textarea</code> and <code>input</code> tags, it needs <a href="https://github.com/beviz/jquery-caret-position-getter">jquery.caretposition.js</a> and <a href="http://code.google.com/p/rangyinputs/downloads/list">textinputs_jquery.js</a>.</p>
+		<h2>Installation</h2>
+        <p>This plugin needs <a href="http://code.google.com/p/rangy/">rangy-core.js</a> for <code>contenteditable</code> areas. For <code>textarea</code> and <code>input</code> tags, it needs <a href="http://code.google.com/p/rangyinputs/downloads/list">textinputs_jquery.js</a>.</p>
 		<p>Put this in your page's <code>&lt;head&gt;</code> tag:</p>
-{% highlight html %}
-<!-- libraries -->
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.14/jquery-ui.min.js"></script>
-<script type="text/javascript" src="rangy-core.js"></script>
-<script type="text/javascript" src="rangy-position.js"></script>
-<script type="text/javascript" src="textinputs_jquery.js"></script>
-<script type="text/javascript" src="jquery.caretposition.js"></script>
+		<pre>
+&lt;!-- libraries --&gt;
+&lt;script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.14/jquery-ui.min.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="rangy-core.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="rangy-position.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="textinputs_jquery.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="jquery.caretposition.js"&gt;&lt;/script&gt;
 
-<!-- MathJax -->
-<script type="text/x-mathjax-config">
+&lt;!-- MathJax --&gt;
+&lt;script type="text/x-mathjax-config"&gt;
   MathJax.Hub.Config({
    tex2jax: {inlineMath: [["$","$"]]},
    displayAlign: "center",
    displayIndent: "0.1em"
   });
-</script>
-<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML.js"></script>
+&lt;/script&gt;
+&lt;script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML.js"&gt;&lt;/script&gt;
 
-<!-- writemaths itself -->
-<script type="text/javascript" src="writemaths.js"></script>
+&lt;!-- writemaths itself --&gt;
+&lt;script type="text/javascript" src="writemaths.js"&gt;&lt;/script&gt;
 
-<!-- initialise writemaths on all elements with class 'wm' -->
-<script language="javascript">
+&lt;!-- initialise writemaths on all elements with class 'wm' --&gt;
+&lt;script language="javascript"&gt;
    $(document).ready(function() {
       $('.wm').writemaths();
    });
-</script>
-{% endhighlight %}
+&lt;/script&gt;
+		</pre>
 
-        <p>Made by <a href="http://github.com/christianp">cp</a> in 2012.</p>
+        <p>Made by <a href="http://github.com/christianp">cp</a> in 2012-2013.</p>
 
         <a href="https://github.com/christianp/writemaths"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png" alt="Fork me on GitHub"></a>
 	</body>
