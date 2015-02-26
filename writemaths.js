@@ -115,7 +115,7 @@ function findMaths(txt,target) {
             var environment = m[1];
             re_end = new RegExp('[^\\\\]\\\\end\\{'+environment+'\\}');    // don't ask if this copes with nested environments
         }
-		else if(startDelimiter.match(/\$/)) {
+		else if(startDelimiter.match(/.\$/)) {
 			re_end = endDelimiters[startDelimiter.slice(1)];
 		} else {
             re_end = endDelimiters[startDelimiter];    // get the corresponding end delimiter for the matched start delimiter
@@ -262,6 +262,18 @@ jQuery(function() {
             }
 
 			updatePreview = $.throttle(100,updatePreview);
+
+
+			// periodically check the iFrame still exists 
+			if(options.iFrame) {
+				function still_there() {
+					if(!jQuery(iframe).parents('html').length) {
+						previewElement.remove();
+						clearInterval(still_there_interval);
+					}
+				}
+				var still_there_interval = setInterval(still_there,100);
+			}
 
             el
 			.on('blur',function(e) {
