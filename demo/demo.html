@@ -1,12 +1,8 @@
 <!doctype html>
 <html>
 	<head>
+        <meta charset="utf-8">
 		<title>Write maths, see maths demo</title>
-
-		<script type="text/javascript" src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-		<script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
-		<script type="text/javascript" src="rangy-core.js"></script>
-		<script type="text/javascript" src="textinputs_jquery.js"></script>
 
 		<!-- MathJax -->
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js">
@@ -18,19 +14,15 @@
 			displayIndent: "0.1em",
 			showProcessingMessages: false
 		  });
+          MathJax.Hub.processSectionDelay = 0;
 	  	</script>
 
 		<script type="text/javascript" src="../writemaths.js"></script>
+        <link rel="stylesheet" href="../writemaths.css">
 
-		<script language="javascript">
-            $(document).ready(function() {
-				$('.wm.ontop').writemaths({position:'center top', previewPosition: 'center bottom', of: 'this'});
-				$('.wm.side').writemaths({position:'right middle', previewPosition: 'left middle'});
-			});
-		</script>
         <style type="text/css">
             body {
-                font-family: 'trebuchet ms', Verdana;
+                font-family: sans-serif;
             }
             textarea {
                 font-size: 1.3em;
@@ -54,7 +46,7 @@
 	<body>
 		<h1>Write maths, see maths demo</h1>
 
-        <div class="wm ontop" contenteditable>
+        <div id="contenteditable" class="wm ontop" contenteditable>
             <p><code class="tex2jax_ignore">$(selector).writemaths()</code> adds a bit of MathJax magic to editable areas so that when you're writing LaTeX, you get an instant preview just above the cursor.</p>
             <p>For example, click inside these LaTeX expressions:</p>
             <ul>
@@ -72,7 +64,7 @@
         <p>
             It works in <code>&lt;textarea&gt;</code> tags too:
             <br/>
-			<textarea class="wm ontop" rows="5" cols="50">a $x+1$
+			<textarea id="textarea" class="wm ontop" rows="5" cols="50">a $x+1$
 \begin{align}
 	x &= 1 \\
 	y &= 2 \\
@@ -83,13 +75,14 @@
         <p>
             And <code>&lt;input&gt;</code> tags, of course:
             <br/>
-            <input type="text" class="wm side" value="$x^2$"/>
+            <input type="text" id="input" class="wm side" value="$x^2$"/>
         </p>
 
-        <p>This plugin needs <a href="http://code.google.com/p/rangy/">rangy-core.js</a> for <code>contenteditable</code> areas. For <code>textarea</code> and <code>input</code> tags, it needs <a href="http://code.google.com/p/rangyinputs/downloads/list">textinputs_jquery.js</a>.</p>
-
-        <p>Made by <a href="http://github.com/christianp">cp</a> in 2012-2013.</p>
-
-        <a href="https://github.com/christianp/writemaths"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png" alt="Fork me on GitHub"></a>
+        <p>Made by <a href="https://somethingorotherwhatever.com">Christian Lawson-Perfect</a> in 2012-2013, updated 2021.</p>
+        <script defer>
+            for(let n of ['contenteditable','textarea','input']) {
+                writemaths(document.getElementById(n));
+            }
+        </script>
 	</body>
 </html>

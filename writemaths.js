@@ -9,78 +9,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 */
 (function() {
 
-function saveSelection(containerEl) {
-    var charIndex = 0, start = 0, end = 0, foundStart = false, stop = {};
-    var sel = rangy.getSelection(), range;
-
-    function traverseTextNodes(node, range) {
-        if (node.nodeType == 3) {
-            if (!foundStart && node == range.startContainer) {
-                start = charIndex + range.startOffset;
-                foundStart = true;
-            }
-            if (foundStart && node == range.endContainer) {
-                end = charIndex + range.endOffset;
-                throw stop;
-            }
-            charIndex += node.length;
-        } else {
-            for (var i = 0, len = node.childNodes.length; i < len; ++i) {
-                traverseTextNodes(node.childNodes[i], range);
-            }
-        }
-    }
-    
-    if (sel.rangeCount) {
-        try {
-            traverseTextNodes(containerEl, sel.getRangeAt(0));
-        } catch (ex) {
-            if (ex != stop) {
-                throw ex;
-            }
-        }
-    }
-
-    return {
-        start: start,
-        end: end
-    };
-}
-
-function restoreSelection(containerEl, savedSel) {
-    var charIndex = 0, range = rangy.createRange(), foundStart = false, stop = {};
-    range.collapseToPoint(containerEl, 0);
-    
-    function traverseTextNodes(node) {
-        if (node.nodeType == 3) {
-            var nextCharIndex = charIndex + node.length;
-            if (!foundStart && savedSel.start >= charIndex && savedSel.start <= nextCharIndex) {
-                range.setStart(node, savedSel.start - charIndex);
-                foundStart = true;
-            }
-            if (foundStart && savedSel.end >= charIndex && savedSel.end <= nextCharIndex) {
-                range.setEnd(node, savedSel.end - charIndex);
-                throw stop;
-            }
-            charIndex = nextCharIndex;
-        } else {
-            for (var i = 0, len = node.childNodes.length; i < len; ++i) {
-                traverseTextNodes(node.childNodes[i]);
-            }
-        }
-    }
-    
-    try {
-        traverseTextNodes(containerEl);
-    } catch (ex) {
-        if (ex == stop) {
-            rangy.getSelection().setSingleRange(range);
-        } else {
-            throw ex;
-        }
-    }
-}
-
 var endDelimiters = {
     '$': /[^\\]\$/,
     '\\(': /[^\\]\\\)/,
@@ -151,153 +79,128 @@ function findMaths(txt,target) {
         }
     }
 }
+var default_options = {
+    cleanMaths: function(m){ return m; },
+    callback: function() {},
+    of: null
+}
 
-jQuery(function() {
-    jQuery("<style type='text/css'> .wm_preview { z-index: 1; position: absolute; display: none; border: 1px solid; padding: 0.2em; width: auto; margin: 0 auto; background: white;} </style>").appendTo("head");
+var previewElement = document.createElement('div');
+previewElement.classList.add('wm_preview');
 
-	jQuery.fn.writemaths = function(custom_options) {
+function hidePreview() {
+    previewElement.classList.remove('show');
+}
+function showPreview() {
+    previewElement.classList.add('show');
+}
 
-        jQuery(this).each(function() {
-			var options = jQuery.extend({
-				cleanMaths: function(m){ return m; },
-				callback: function() {},
-				iFrame: false,
-				position: 'left top',
-				previewPosition: 'left top'
-			},custom_options);
+var last_math;
 
-            var textarea = jQuery(this).is('textarea,input');
+function should_ignore(element) {
+    return element.nodeType == element.ELEMENT_NODE && (MathJax.Hub.config.tex2jax.skipTags.indexOf(element.nodeName.toLowerCase())!=-1 || element.classList.contains(MathJax.Hub.config.tex2jax.ignoreClass));
+}
 
-			var root = this;
-			var el;
-			var iframe;
+function writemaths(element, options) {
+    document.body.appendChild(previewElement);
+    options = Object.assign({},default_options,options);
+    options.of = options.of || element;
 
-			if(options.of=='this')
-				options.of = root;
+    element.classList.add('tex2jax_ignore');
 
-            if(options.iFrame) {
-    			iframe = jQuery(this).find('iframe')[0];
-                el = jQuery(iframe).contents().find('body');
+    var queue = MathJax.Callback.Queue(MathJax.Hub.Register.StartupHook("End",{}));
+
+    var is_input = element.nodeName == 'TEXTAREA' || element.nodeName == 'INPUT';
+
+    function positionPreview() {
+        var rect = options.of.getBoundingClientRect();
+        var prect = previewElement.getBoundingClientRect();
+        previewElement.style.top = rect.y+'px';
+        previewElement.style.left = (rect.x+(rect.width-prect.width)/2)+'px';
+    }
+
+    function updatePreview(e) {
+        var txt, start;
+
+        hidePreview();
+
+        if(is_input) {
+            if(element.selectionStart != element.selectionEnd) {
+                return;
             }
-            else
-            {
-                el = jQuery(this);
+            txt = element.value;
+            start = element.selectionStart;
+        } else {
+            sel = window.getSelection();
+            if(!sel.isCollapsed) {
+                return;
             }
-            el.addClass('writemaths tex2jax_ignore');
-            var previewElement = jQuery('<div class="wm_preview"/>');
-			jQuery('body').append(previewElement);
+            var range = sel.getRangeAt(0);
 
-            var queue = MathJax.Callback.Queue(MathJax.Hub.Register.StartupHook("End",{}));
-
-			var txt, sel, range;
-			function positionPreview() {
-				var of = options.of ? options.of : options.iFrame ? iframe : textarea ? root : document;
-				previewElement.position({my: options.previewPosition, at: options.position, of: of, collision: 'fit'})
-			}
-
-			function updatePreview(e) {
-                previewElement.hide();
-
-                if(textarea) {
-                    sel = jQuery(this).getSelection();
-                    range = {startOffset: sel.start, endOffset: sel.end};
-                    txt = jQuery(this).val();
-                }
-                else {
-                    sel = options.iFrame ? rangy.getIframeSelection(iframe) : rangy.getSelection();
-                    var anchor = sel.anchorNode;
-
-                    range = sel.getRangeAt(0);
-
-					if(anchor.nodeType == anchor.TEXT_NODE) {	
-						while(anchor.previousSibling) {
-							anchor = anchor.previousSibling;
-							range.startOffset += anchor.textContent.length;
-							range.endOffset += anchor.textContent.length;
-						}
-						anchor = anchor.parentNode;
-					}
-
-                    if(jQuery(anchor).add(jQuery(anchor).parents()).filter('code,pre,.wm_ignore').length)
-                        return;
-                    txt = jQuery(anchor).text();
-                }
-
-                //only do this if the selection has zero width
-                //so when you're selecting blocks of text, distracting previews don't pop up
-                if(range.startOffset != range.endOffset)
+            var e = range.startContainer;
+            while(e && e != element) {
+                if(should_ignore(e)) {
                     return;
-
-				var target = range.startOffset;
-
-				var q = findMaths(txt,target);
-
-				if(!q)
-					return;
-
-                var math;
-				if(q.startDelimiter.match(/^\\begin/))
-					math = q.startDelimiter + q.math + (q.endDelimiter ? q.endDelimiter : '');
-				else
-					math = q.math;
-
-                if(!math.length)
-                    return;
-
-                previewElement.show();
-
-				if(math!=$(this).data('writemaths-lastMath')) {
-					var script = document.createElement('script');
-					script.setAttribute('type','math/tex');
-					script.textContent = options.cleanMaths(math);
-					previewElement.html(script);
-					$(this).data('writemaths-lastMath',math);
-					queue.Push(['Typeset',MathJax.Hub,previewElement[0]]);
-					queue.Push(positionPreview);
-					queue.Push(options.callback);
-				}
-
-                positionPreview();
-
+                }
+                e = e.parentElement;
             }
 
-			updatePreview = $.throttle(100,updatePreview);
+            txt = range.startContainer.textContent;
+            start = range.startOffset;
+            for(var n = range.startContainer.previousSibling;n;n=n.previousSibling) {
+                if(should_ignore(n)) {
+                    continue;
+                }
+                txt = n.textContent + txt;
+                start += n.textContent.length;
+            }
+            for(var n = range.startContainer.nextSibling;n;n=n.nextSibling) {
+                if(should_ignore(n)) {
+                    continue;
+                }
+                txt = txt + n.textContent;
+            }
+        }
 
+        var q = findMaths(txt,start);
 
-			// periodically check the iFrame still exists 
-			if(options.iFrame) {
-				function still_there() {
-					if(!jQuery(iframe).parents('html').length) {
-						previewElement.remove();
-						clearInterval(still_there_interval);
-						el.off();
-					}
-				}
-				var still_there_interval = setInterval(still_there,100);
-			}
+        if(!q) {
+            return;
+        }
 
-            el
-			.on('blur',function(e) {
-				previewElement.hide();
-			})
-			.on('keyup click',updatePreview);
-			if(options.iFrame)
-				$(el[0].ownerDocument).on('scroll',updatePreview);
-			else
-				el.on('scroll',updatePreview);
+        var math;
+        if(q.startDelimiter.match(/^\\begin/)) {
+            math = q.startDelimiter + q.math + (q.endDelimiter ? q.endDelimiter : '');
+        } else {
+            math = q.math;
+        }
 
-        });
-		return this;
-	}
-});
+        if(!math.length) {
+            return;
+        }
 
-/*
- * jQuery throttle / debounce - v1.1 - 3/7/2010
- * http://benalman.com/projects/jquery-throttle-debounce-plugin/
- * 
- * Copyright (c) 2010 "Cowboy" Ben Alman
- * Dual licensed under the MIT and GPL licenses.
- * http://benalman.com/about/license/
- */
-(function(b,c){var $=b.jQuery||b.Cowboy||(b.Cowboy={}),a;$.throttle=a=function(e,f,j,i){var h,d=0;if(typeof f!=="boolean"){i=j;j=f;f=c}function g(){var o=this,m=+new Date()-d,n=arguments;function l(){d=+new Date();j.apply(o,n)}function k(){h=c}if(i&&!h){l()}h&&clearTimeout(h);if(i===c&&m>e){l()}else{if(f!==true){h=setTimeout(i?k:l,i===c?e-m:e)}}}if($.guid){g.guid=j.guid=j.guid||$.guid++}return g};$.debounce=function(d,e,f){return f===c?a(d,e,false):a(d,f,e!==false)}})(this);
+        showPreview();
+
+        if(math!=last_math) {
+            var script = document.createElement('script');
+            script.setAttribute('type','math/tex');
+            script.textContent = options.cleanMaths(math);
+            previewElement.innerHTML = '';
+            previewElement.appendChild(script);
+            last_math = math;
+            queue.Push(['Typeset',MathJax.Hub,previewElement[0]]);
+            queue.Push(positionPreview);
+            queue.Push(options.callback);
+        }
+
+        positionPreview();
+
+    }
+
+    element.addEventListener('blur',hidePreview);
+    element.addEventListener('keyup',updatePreview);
+    element.addEventListener('click',updatePreview);
+    element.addEventListener('scroll',updatePreview);
+};
+window.writemaths = writemaths;
 })();

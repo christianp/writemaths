@@ -1,0 +1,13 @@
+.wm_preview { 
+    z-index: 1; 
+    position: absolute;
+    display: none;
+    border: 1px solid;
+    padding: 0.2em;
+    width: auto;
+    margin: 0 auto;
+    background: white;
+}
+.wm_preview.show {
+    display: block;
+}
