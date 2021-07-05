@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+	<head>
+        <meta charset="utf-8">
+		<title>Write maths, see maths demo</title>
+
+		<!-- MathJax -->
+        <script>
+MathJax = {
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',    //  class that marks tags not to search
+  }
+};
+        </script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+		<script type="text/javascript" src="../writemaths.js"></script>
+        <link rel="stylesheet" href="../writemaths.css">
+
+        <style type="text/css">
+            body {
+                font-family: sans-serif;
+            }
+            textarea {
+                font-size: 1.3em;
+            }
+            input {
+                font-size: 1em;
+            }
+			.wm {
+				border: 1px solid gray;
+                margin: 0 1em;
+            }
+            div.wm {
+                min-height: 5em;
+                padding: 0 1em;
+            }
+            input.wm {
+                height: 1.5em;
+            }
+		</style>
+	</head>
+	<body>
+		<h1>Write maths, see maths demo</h1>
+
+        <p>\[a\]</p>
+
+        <div id="contenteditable" class="wm ontop tex2jax_ignore" contenteditable>
+            <p><code class="tex2jax_ignore">$(selector).writemaths()</code> adds a bit of MathJax magic to editable areas so that when you're writing LaTeX, you get an instant preview just above the cursor.</p>
+            <p>For example, click inside these LaTeX expressions:</p>
+            <ul>
+				<li><p>$e^{\pi i} + 1 = 0$</p></li>
+				<li><p>\[e^{\pi i} + 1 = 0\]</p></li>
+				<li><p>\begin{align}<br/>
+				x &= 1 \\<br/>
+				y &= 2 \\<br/>
+				\end{align}</p></li>
+				<li><p>Of course, it works when maths is in the middle of a line, like $\log_2 \left( \frac{1}{x+2} \right)$ is.</p></li>
+            </ul>
+            <p>But stuff inside a <code>&lt;code&gt;</code> tag doesn't count: <code>$e^{\pi i}+1 = 0$</code>.</p>
+        </div>
+
+        <p>
+            It works in <code>&lt;textarea&gt;</code> tags too:
+            <br/>
+			<textarea id="textarea" class="wm ontop" rows="5" cols="50">a $x+1$
+\begin{align}
+	x &= 1 \\
+	y &= 2 \\
+	z &= 3
+\end{align}
+</textarea>
+        </p>
+        <p>
+            And <code>&lt;input&gt;</code> tags, of course:
+            <br/>
+            <input type="text" id="input" class="wm side" value="$x^2$"/>
+        </p>
+
+        <p>Made by <a href="https://somethingorotherwhatever.com">Christian Lawson-Perfect</a> in 2012-2013, updated 2021.</p>
+        <script defer>
+            var wait_for_mathjax = setInterval(function() {
+                if(MathJax.startup) {
+                    clearInterval(wait_for_mathjax);
+                    for(let n of ['contenteditable','textarea','input']) {
+                        writemaths(document.getElementById(n));
+                    }
+                }
+            },50);
+        </script>
+	</body>
+</html>

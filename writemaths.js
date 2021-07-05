@@ -95,20 +95,44 @@ function showPreview() {
     previewElement.classList.add('show');
 }
 
-var last_math;
-
-function should_ignore(element) {
-    return element.nodeType == element.ELEMENT_NODE && (MathJax.Hub.config.tex2jax.skipTags.indexOf(element.nodeName.toLowerCase())!=-1 || element.classList.contains(MathJax.Hub.config.tex2jax.ignoreClass));
-}
-
 function writemaths(element, options) {
+    var last_math;
+
+    function should_ignore(element) {
+        return element.nodeType == element.ELEMENT_NODE && (config.skipTags.indexOf(element.nodeName.toLowerCase())!=-1 || element.classList.contains(config.ignoreClass));
+    }
+
+    var config = {
+        skipTags: [],
+        ignoreClass: ''
+    }
+    var MJ_VERSION = MathJax.version.match(/(^\d+)\./)[1];
+
+    var config_loaders = {
+        '3': function() {
+            var h = new MathJax._.handlers.html.HTMLDomStrings.HTMLDomStrings(MathJax.config.options);
+            skipTags = h.options.skipHtmlTags;
+            ignoreClass = h.options.ignoreHtmlClass;
+        },
+        '2': function() {
+            skipTags = MathJax.Hub.config.tex2jax.skipTags;
+            ignoreClass = MathJax.Hub.config.tex2jax.ignoreClass;
+        }
+    }
+
+    if(!config_loaders[MJ_VERSION]) {
+        throw(new Error("Unrecognised MathJax version: "+MJ_VERSION));
+    }
+
     document.body.appendChild(previewElement);
     options = Object.assign({},default_options,options);
     options.of = options.of || element;
 
     element.classList.add('tex2jax_ignore');
 
-    var queue = MathJax.Callback.Queue(MathJax.Hub.Register.StartupHook("End",{}));
+    if(MJ_VERSION=='2') {
+        var queue = MathJax.Callback.Queue(MathJax.Hub.Register.StartupHook("End",{}));
+    }
 
     var is_input = element.nodeName == 'TEXTAREA' || element.nodeName == 'INPUT';
 
@@ -182,15 +206,27 @@ function writemaths(element, options) {
         showPreview();
 
         if(math!=last_math) {
-            var script = document.createElement('script');
-            script.setAttribute('type','math/tex');
-            script.textContent = options.cleanMaths(math);
             previewElement.innerHTML = '';
-            previewElement.appendChild(script);
             last_math = math;
-            queue.Push(['Typeset',MathJax.Hub,previewElement[0]]);
-            queue.Push(positionPreview);
-            queue.Push(options.callback);
+            switch(MJ_VERSION) {
+                case '2':
+                    var script = document.createElement('script');
+                    script.setAttribute('type','math/tex');
+                    script.textContent = options.cleanMaths(math);
+                    previewElement.appendChild(script);
+                    queue.Push(['Typeset',MathJax.Hub,previewElement[0]]);
+                    queue.Push(positionPreview);
+                    queue.Push(options.callback);
+                    break;
+                case '3':
+                    MathJax.tex2chtmlPromise(math).then(function(mjx) {
+                        previewElement.appendChild(mjx);
+                        positionPreview();
+                        MathJax.chtmlStylesheet();
+
+                        options.callback && options.callback();
+                    });
+            }
         }
 
         positionPreview();
